@@ -3,13 +3,15 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { FileViewerComponent } from './components/file-viewer/file-viewer.component';
+import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
+import { ApiSelectorComponent } from './components/api-selector/api-selector.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FileUploadComponent, FileViewerComponent, TranslateModule],
+  imports: [RouterOutlet, CommonModule, FileUploadComponent, FileViewerComponent, LanguageSelectorComponent, ApiSelectorComponent, TranslateModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -17,6 +19,9 @@ export class AppComponent implements OnInit {
   title = 'renpy-translation';
   fileContent: string | null = null;
   fileName: string = '';
+  selectedApi: string = '';
+  apiKey: string = '';
+  targetLanguage: string = '';
 
   constructor(
     private readonly translateService: TranslateService,
@@ -33,9 +38,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  changeLanguage(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const lang = select.value;
+  onLanguageChanged(lang: string): void {
     this.translateService.use(lang);
 
     // Update the page title when language changes
@@ -62,5 +65,14 @@ export class AppComponent implements OnInit {
     };
 
     reader.readAsText(file);
+  }
+
+  handleApiSelected(apiSettings: {api: string, key: string, language: string}): void {
+    this.selectedApi = apiSettings.api;
+    this.apiKey = apiSettings.key;
+    this.targetLanguage = apiSettings.language;
+
+    console.log('API Settings:', apiSettings);
+    // In a real application, you would use these settings to call the translation API
   }
 }

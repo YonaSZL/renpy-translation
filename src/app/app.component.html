@@ -1,12 +1,8 @@
-<div class="language-selector">
-  <select (change)="changeLanguage($event)">
-    <option value="en">{{ 'ENGLISH' | translate }}</option>
-    <option value="fr">{{ 'FRENCH' | translate }}</option>
-  </select>
-</div>
+<app-language-selector (languageChanged)="onLanguageChanged($event)"></app-language-selector>
 
 <div class="container">
   <app-file-upload (fileSelected)="handleFileSelected($event)"></app-file-upload>
+  <app-api-selector (apiSelected)="handleApiSelected($event)"></app-api-selector>
   <app-file-viewer [fileName]="fileName" [fileContent]="fileContent"></app-file-viewer>
 </div>
 

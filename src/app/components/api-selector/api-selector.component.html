@@ -1,0 +1,64 @@
+<div class="api-selector-container">
+  <h3>{{ 'API_SELECTOR_TITLE' | translate }}</h3>
+
+  <div class="form-group">
+    <label for="api-select">{{ 'SELECT_API' | translate }}</label>
+    <select
+      id="api-select"
+      [(ngModel)]="selectedApi"
+      (change)="onApiChange()"
+      [attr.aria-label]="'SELECT_API' | translate">
+      <option *ngFor="let api of apis" [value]="api.id">{{ api.name }}</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="api-key">{{ 'API_KEY' | translate }}</label>
+    <div class="input-with-button">
+      <input
+        type="text"
+        id="api-key"
+        [(ngModel)]="apiKey"
+        [attr.placeholder]="'ENTER_API_KEY' | translate"
+        [attr.aria-label]="'API_KEY' | translate">
+      <button
+        type="button"
+        class="fetch-button"
+        (click)="onApiChange()"
+        [disabled]="isLoading">
+        {{ 'FETCH_LANGUAGES' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="language-select">{{ 'TARGET_LANGUAGE' | translate }}</label>
+    <select
+      id="language-select"
+      [(ngModel)]="selectedLanguage"
+      [attr.aria-label]="'TARGET_LANGUAGE' | translate"
+      [disabled]="isLoading">
+      <option *ngFor="let lang of availableLanguages" [value]="lang.code">{{ lang.name }}</option>
+    </select>
+
+    <span class="default-language-message">
+      {{ 'DEFAULT_LANGUAGE_MESSAGE' | translate }} {{ getLanguageName(currentPageLanguage) }}
+    </span>
+
+    <div *ngIf="isLoading" class="loading-indicator">
+      <output>{{ 'LOADING_LANGUAGES' | translate }}</output>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message" role="alert">
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="submit-button"
+    (click)="onSubmit()"
+    [disabled]="isLoading || !selectedLanguage">
+    {{ 'APPLY_SETTINGS' | translate }}
+  </button>
+</div>
