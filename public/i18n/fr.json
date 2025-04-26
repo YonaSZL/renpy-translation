@@ -1,0 +1,15 @@
+{
+  "APP_TITLE": "Traduction Renpy",
+  "DRAG_DROP_FILES": "Glisser & Déposer les Fichiers Ici",
+  "ONLY_RPY_FILES": "Seuls les fichiers .rpy sont autorisés",
+  "BROWSE_FILES": "Parcourir les Fichiers",
+  "ERROR_ONLY_RPY": "Seuls les fichiers .rpy sont autorisés.",
+  "ERROR_READING_FILE": "Erreur de lecture du fichier. Veuillez réessayer.",
+  "ARIA_FILE_UPLOAD_AREA": "Zone de téléchargement de fichiers",
+  "ARIA_FILE_INPUT": "Entrée de fichier",
+  "ARIA_FILE_CONTENT_VIEWER": "Visualiseur de contenu de fichier",
+  "ARIA_FILE_CONTENT": "Contenu du fichier",
+  "LANGUAGE": "Langue",
+  "ENGLISH": "Anglais",
+  "FRENCH": "Français"
+}

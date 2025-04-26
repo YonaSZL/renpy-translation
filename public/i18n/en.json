@@ -1,0 +1,15 @@
+{
+  "APP_TITLE": "RenpyTranslation",
+  "DRAG_DROP_FILES": "Drag & Drop Files Here",
+  "ONLY_RPY_FILES": "Only .rpy files are allowed",
+  "BROWSE_FILES": "Browse Files",
+  "ERROR_ONLY_RPY": "Only .rpy files are allowed.",
+  "ERROR_READING_FILE": "Error reading file. Please try again.",
+  "ARIA_FILE_UPLOAD_AREA": "File upload area",
+  "ARIA_FILE_INPUT": "File input",
+  "ARIA_FILE_CONTENT_VIEWER": "File content viewer",
+  "ARIA_FILE_CONTENT": "File content",
+  "LANGUAGE": "Language",
+  "ENGLISH": "English",
+  "FRENCH": "French"
+}

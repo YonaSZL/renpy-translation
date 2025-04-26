@@ -1,10 +1,11 @@
 import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-file-upload',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './file-upload.component.html',
   styleUrl: './file-upload.component.css'
 })
@@ -15,6 +16,8 @@ export class FileUploadComponent {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Output() fileSelected = new EventEmitter<File>();
+
+  constructor(private readonly translateService: TranslateService) {}
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -43,8 +46,10 @@ export class FileUploadComponent {
       if (this.isValidRpyFile(file)) {
         this.fileSelected.emit(file);
       } else {
-        this.errorMessage = 'Only .rpy files are allowed.';
-        this.showError = true;
+        this.translateService.get('ERROR_ONLY_RPY').subscribe((errorMsg: string) => {
+          this.errorMessage = errorMsg;
+          this.showError = true;
+        });
       }
     }
   }
@@ -62,10 +67,12 @@ export class FileUploadComponent {
       if (this.isValidRpyFile(file)) {
         this.fileSelected.emit(file);
       } else {
-        this.errorMessage = 'Only .rpy files are allowed.';
-        this.showError = true;
-        // Reset the file input
-        input.value = '';
+        this.translateService.get('ERROR_ONLY_RPY').subscribe((errorMsg: string) => {
+          this.errorMessage = errorMsg;
+          this.showError = true;
+          // Reset the file input
+          input.value = '';
+        });
       }
     }
   }

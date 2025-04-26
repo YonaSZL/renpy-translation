@@ -1,5 +1,5 @@
 <section class="drag-drop-area"
-     aria-label="File upload area"
+     [attr.aria-label]="'ARIA_FILE_UPLOAD_AREA' | translate"
      [class.active]="isDragOver"
      (dragover)="onDragOver($event)"
      (dragleave)="onDragLeave($event)"
@@ -11,10 +11,10 @@
            width="64"
            alt="Upload icon">
     </div>
-    <h3>Drag & Drop Files Here</h3>
-    <p class="file-type-info">Only .rpy files are allowed</p>
-    <button class="browse-button" (click)="triggerFileInput()">Browse Files</button>
-    <input type="file" #fileInput style="display: none" accept=".rpy" (change)="onFileSelected($event)" aria-label="File input">
+    <h3>{{ 'DRAG_DROP_FILES' | translate }}</h3>
+    <p class="file-type-info">{{ 'ONLY_RPY_FILES' | translate }}</p>
+    <button class="browse-button" (click)="triggerFileInput()">{{ 'BROWSE_FILES' | translate }}</button>
+    <input type="file" #fileInput style="display: none" accept=".rpy" (change)="onFileSelected($event)" [attr.aria-label]="'ARIA_FILE_INPUT' | translate">
     <div *ngIf="showError" class="error-message" role="alert">
       {{ errorMessage }}
     </div>
