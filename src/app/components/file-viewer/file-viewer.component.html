@@ -1,0 +1,11 @@
+<section class="file-content-container" *ngIf="fileContent" aria-label="File content viewer">
+  <button class="file-header"
+       [attr.aria-expanded]="!isCollapsed"
+       (click)="toggleCollapse()">
+    <h3>{{ fileName }}</h3>
+    <span class="collapse-icon" aria-hidden="true">{{ isCollapsed ? '▼' : '▲' }}</span>
+  </button>
+  <section class="file-content" [class.collapsed]="isCollapsed" aria-label="File content">
+    <pre>{{ fileContent }}</pre>
+  </section>
+</section>

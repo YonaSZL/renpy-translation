@@ -1,0 +1,22 @@
+<section class="drag-drop-area"
+     aria-label="File upload area"
+     [class.active]="isDragOver"
+     (dragover)="onDragOver($event)"
+     (dragleave)="onDragLeave($event)"
+     (drop)="onDrop($event)">
+  <div class="drag-drop-content">
+    <div class="icon">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNjQiIHdpZHRoPSI2NCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTkuMzUgMTAuMDRDMTguNjcgNi41OSAxNS42NCA0IDEyIDQgOS4xMSA0IDYuNiA1LjY0IDUuMzUgOC4wNCAyLjM0IDguMzYgMCAxMC45MSAwIDE0YzAgMy4zMSAyLjY5IDYgNiA2aDEzYzIuNzYgMCA1LTIuMjQgNS01IDAtMi42NC0yLjA1LTQuNzgtNC42NS00Ljk2ek0xNCAxM3Y0aC00di00SDdsNS01IDUgNWgtM3oiLz48L3N2Zz4="
+           height="64"
+           width="64"
+           alt="Upload icon">
+    </div>
+    <h3>Drag & Drop Files Here</h3>
+    <p class="file-type-info">Only .rpy files are allowed</p>
+    <button class="browse-button" (click)="triggerFileInput()">Browse Files</button>
+    <input type="file" #fileInput style="display: none" accept=".rpy" (change)="onFileSelected($event)" aria-label="File input">
+    <div *ngIf="showError" class="error-message" role="alert">
+      {{ errorMessage }}
+    </div>
+  </div>
+</section>
