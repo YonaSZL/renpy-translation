@@ -261,7 +261,7 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 	}
 
 	generateTranslationFile(content: string): void {
-		const blob = this.translationProcessorService.generateTranslationFile(content, this.translationFileName());
+		const blob = this.translationProcessorService.generateTranslationFile(content);
 		const url = window.URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
