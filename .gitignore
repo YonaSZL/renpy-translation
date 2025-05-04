@@ -31,6 +31,10 @@ yarn-error.log
 # Miscellaneous
 /.angular/cache
 .sass-cache/
+# Generated CSS files
+*.css
+*.css.map
+!src/styles.css
 /connect.lock
 /coverage
 /libpeerconnection.log

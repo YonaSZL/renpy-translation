@@ -1,0 +1,31 @@
+<div *ngIf="extractedLinesCount > 0" class="extracted-lines-info">
+	<div class="extracted-header">{{ 'EXTRACTED_LINES_INFO' | translate }}</div>
+	<div class="extracted-details">
+		<div>{{ 'LINES_TO_TRANSLATE' | translate }}: {{ extractedLinesCount }}</div>
+		<div>{{ 'CHARACTER_COUNT' | translate }}: {{ extractedLinesCharCount | number }}</div>
+
+		<!-- Warning if translation will exceed API limit -->
+		<div *ngIf="willExceedLimit" class="limit-warning">
+			<ng-container *ngIf="selectedApi === 'deepl-free'">
+				{{ 'LIMIT_EXCEEDED_WARNING' | translate }}
+			</ng-container>
+			<ng-container *ngIf="selectedApi === 'google-free'">
+				{{ 'GOOGLE_LIMIT_EXCEEDED_WARNING' | translate }}
+			</ng-container>
+			<div class="limit-details">
+				{{ 'LIMITS_EXCEEDED_DETAILS' | translate }}
+			</div>
+		</div>
+
+		<!-- Warning if translation will exceed file character limit -->
+		<div *ngIf="willExceedFileLimit" class="limit-warning">
+			<ng-container *ngIf="selectedApi === 'google-free'">
+				{{ 'FILE_CHAR_LIMIT_WARNING' | translate }}
+			</ng-container>
+			<div class="limit-details">
+				{{ 'MAX_CHARS_PER_FILE' | translate }}
+				: {{ fileCharLimit | number }} {{ 'CHARACTERS' | translate }}
+			</div>
+		</div>
+	</div>
+</div>

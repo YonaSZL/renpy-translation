@@ -1,0 +1,93 @@
+@import '../../../../styles/variables';
+
+:host {
+	display: block;
+}
+
+.api-usage-info {
+	@include card;
+}
+
+.loading-usage {
+	font-style: italic;
+	color: $text-color-light;
+}
+
+.updating-usage {
+	font-weight: bold;
+	color: $primary-color;
+	background-color: rgba($primary-color, 0.1);
+	padding: $spacing-md;
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $primary-color;
+}
+
+.countdown-bar {
+	height: $spacing-md;
+	background-color: $text-color-light;
+	border-radius: $border-radius-md;
+	overflow: hidden;
+	margin-top: $spacing-md;
+}
+
+.countdown-progress {
+	height: 100%;
+	background-color: $primary-color;
+	transition: width $transition-speed;
+}
+
+.usage-header {
+	font-weight: bold;
+	margin-bottom: $spacing-md;
+	color: $text-color;
+}
+
+.usage-details {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xxl;
+}
+
+.limit-section {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+	padding: $spacing-md;
+	background-color: $secondary-color;
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $primary-color;
+}
+
+.limit-label {
+	font-weight: bold;
+	color: $text-color;
+}
+
+.usage-bar {
+	height: $spacing-md;
+	background-color: $text-color-light;
+	border-radius: $border-radius-md;
+	overflow: hidden;
+}
+
+.usage-progress {
+	height: 100%;
+	background-color: $primary-color;
+	transition: width $transition-speed;
+}
+
+.usage-error {
+	color: $error-color;
+	font-weight: bold;
+}
+
+.usage-note {
+	font-style: italic;
+	color: $text-color-light;
+	font-size: $base-font-size;
+	margin-top: $spacing-md;
+	padding: $spacing-md;
+	background-color: $secondary-color;
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $primary-color;
+}

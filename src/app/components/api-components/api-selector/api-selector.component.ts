@@ -2,19 +2,29 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {TranslationApiService} from '../../services/translation-api.service';
+import {TranslationApiService} from '../../../services/translation-api.service';
 import {catchError, finalize} from 'rxjs/operators';
 import {of, Subscription} from 'rxjs';
-import {LanguageLocalizationService} from '../../services/language-localization.service';
-import {SupportedLanguage} from '../../models/supported-language.model';
-import {ApiDetails} from '../../models/api-details';
+import {LanguageLocalizationService} from '../../../services/language-localization.service';
+import {SupportedLanguage} from '../../../models/supported-language.model';
+import {ApiDetails} from '../../../models/api-details';
+import {ApiSelectionComponent} from '../api-selection/api-selection.component';
+import {ApiKeyInputComponent} from '../api-key-input/api-key-input.component';
+import {LanguageSelectionComponent} from '../../language-components/language-selection/language-selection.component';
 
 @Component({
 	selector: 'app-api-selector',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TranslateModule],
+	imports: [
+		CommonModule,
+		FormsModule,
+		TranslateModule,
+		ApiSelectionComponent,
+		ApiKeyInputComponent,
+		LanguageSelectionComponent
+	],
 	templateUrl: './api-selector.component.html',
-	styleUrl: './api-selector.component.css'
+	styleUrl: './api-selector.component.scss'
 })
 export class ApiSelectorComponent implements OnInit, OnDestroy {
 	apis: ApiDetails[] = [];
@@ -27,6 +37,7 @@ export class ApiSelectorComponent implements OnInit, OnDestroy {
 	errorMessage: string = '';
 	@Output() apiSelected = new EventEmitter<ApiDetails>();
 	private langChangeSubscription: Subscription | null = null;
+	private apiKeyTimeout: any;
 
 	constructor(
 		private readonly translateService: TranslateService,
@@ -70,7 +81,11 @@ export class ApiSelectorComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	onApiChange(): void {
+	onApiChange(newApi?: string): void {
+		if (newApi !== undefined) {
+			this.selectedApi = newApi;
+		}
+
 		this.errorMessage = '';
 		this.isLoading = true;
 		this.availableLanguages = [];
@@ -90,6 +105,10 @@ export class ApiSelectorComponent implements OnInit, OnDestroy {
 			return;
 		}
 
+		// Always notify parent component of API change, even if there's no API key
+		// This ensures the selected API updates correctly when switching APIs
+		this.onSubmit();
+
 		if (!this.apiKey) {
 			this.isLoading = false;
 			return;
@@ -103,7 +122,11 @@ export class ApiSelectorComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	onApiKeyChange(): void {
+	onApiKeyChange(newApiKey?: string): void {
+		if (newApiKey !== undefined) {
+			this.apiKey = newApiKey;
+		}
+
 		// Debounce the API key input to avoid too many requests
 		if (this.apiKeyTimeout) {
 			clearTimeout(this.apiKeyTimeout);
@@ -132,9 +155,12 @@ export class ApiSelectorComponent implements OnInit, OnDestroy {
 		}, 500); // Wait for 500ms after the user stops typing
 	}
 
-	private apiKeyTimeout: any;
+	onSubmit(newLanguage?: string): void {
+		// If a new language is provided, update the selected language
+		if (newLanguage !== undefined) {
+			this.selectedLanguage = newLanguage;
+		}
 
-	onSubmit(): void {
 		// Check if we have valid settings to apply
 		if (!this.selectedLanguage) {
 			return;

@@ -1,0 +1,23 @@
+<div class="form-group">
+	<label for="language-select">{{ 'TARGET_LANGUAGE' | translate }}</label>
+	<select
+		(change)="onLanguageChange()"
+		[(ngModel)]="selectedLanguage"
+		[attr.aria-label]="'TARGET_LANGUAGE' | translate"
+		[disabled]="isLoading"
+		id="language-select">
+		<option *ngFor="let lang of availableLanguages" [value]="lang.code">{{ lang.name }}</option>
+	</select>
+
+	<span class="default-language-message">
+      {{ 'DEFAULT_LANGUAGE_MESSAGE' | translate }} {{ languageLocalizationService.getLanguageName(currentPageLanguage) }}
+    </span>
+
+	<div *ngIf="isLoading" class="loading-indicator">
+		<output>{{ 'LOADING_LANGUAGES' | translate }}</output>
+	</div>
+
+	<div *ngIf="errorMessage" class="error-message" role="alert">
+		{{ errorMessage }}
+	</div>
+</div>

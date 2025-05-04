@@ -1,4 +1,4 @@
 export interface SupportedLanguage {
-    code: string;
-    name: string;
+	code: string;
+	name: string;
 }

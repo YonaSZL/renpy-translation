@@ -7,7 +7,7 @@ import {TranslateModule} from '@ngx-translate/core';
 	standalone: true,
 	imports: [CommonModule, TranslateModule],
 	templateUrl: './file-viewer.component.html',
-	styleUrl: './file-viewer.component.css'
+	styleUrl: './file-viewer.component.scss'
 })
 export class FileViewerComponent {
 	@Input() fileName: string = '';

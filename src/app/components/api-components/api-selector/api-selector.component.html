@@ -1,0 +1,25 @@
+<div class="api-selector-container">
+	<h3>{{ 'API_SELECTOR_TITLE' | translate }}</h3>
+
+	<app-api-selection
+		(apiChange)="onApiChange($event)"
+		[apis]="apis"
+		[selectedApi]="selectedApi">
+	</app-api-selection>
+
+	<app-api-key-input
+		(apiKeyChange)="onApiKeyChange($event)"
+		*ngIf="selectedApi !== 'google-free'"
+		[apiKey]="apiKey">
+	</app-api-key-input>
+
+	<app-language-selection
+		(languageChange)="onSubmit($event)"
+		[availableLanguages]="availableLanguages"
+		[currentPageLanguage]="currentPageLanguage"
+		[errorMessage]="errorMessage"
+		[isLoading]="isLoading"
+		[selectedLanguage]="selectedLanguage">
+	</app-language-selection>
+
+</div>

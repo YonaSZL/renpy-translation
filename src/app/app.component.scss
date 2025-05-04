@@ -1,0 +1,8 @@
+@import '../styles/variables';
+
+.container {
+	max-width: $container-max-width;
+	margin: 0 auto;
+	padding: $spacing-xxxl;
+	font-family: $base-font-family;
+}

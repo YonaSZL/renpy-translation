@@ -7,7 +7,7 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
 	standalone: true,
 	imports: [CommonModule, TranslateModule],
 	templateUrl: './file-upload.component.html',
-	styleUrl: './file-upload.component.css'
+	styleUrl: './file-upload.component.scss'
 })
 export class FileUploadComponent {
 	isDragOver = false;

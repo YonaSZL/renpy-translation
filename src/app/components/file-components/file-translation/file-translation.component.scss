@@ -1,0 +1,151 @@
+@import '../../../../styles/variables';
+
+.file-translation-container {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	gap: $spacing-xxl;
+	padding: $spacing-xxl;
+	background-color: $secondary-color;
+	border-radius: $border-radius-lg;
+	margin: $spacing-xxl 0 $spacing-xxxl;
+}
+
+.translate-button {
+	@include primary-button;
+	gap: $spacing-md;
+	padding: $spacing-xl $spacing-xxxl;
+	font-size: $base-font-size;
+	width: auto;
+	margin: 0 auto;
+
+	mat-icon {
+		font-size: $large-font-size;
+		height: $large-font-size;
+		width: $large-font-size;
+	}
+}
+
+/* API Usage Information Styles */
+.api-usage-info {
+	@include card;
+}
+
+.loading-usage {
+	font-style: italic;
+	color: $text-color-light;
+}
+
+.updating-usage {
+	font-weight: bold;
+	color: $primary-color;
+	background-color: rgba($primary-color, 0.1);
+	padding: $spacing-md;
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $primary-color;
+}
+
+.countdown-bar {
+	height: $spacing-md;
+	background-color: $text-color-light;
+	border-radius: $border-radius-md;
+	overflow: hidden;
+	margin-top: $spacing-md;
+}
+
+.countdown-progress {
+	height: 100%;
+	background-color: $primary-color;
+	transition: width $transition-speed;
+}
+
+.usage-header {
+	font-weight: bold;
+	margin-bottom: $spacing-md;
+	color: $text-color;
+}
+
+.usage-details {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xxl;
+}
+
+.limit-section {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-xs;
+	padding: $spacing-md;
+	background-color: $secondary-color;
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $primary-color;
+}
+
+.limit-label {
+	font-weight: bold;
+	color: $text-color;
+}
+
+.usage-bar {
+	height: $spacing-md;
+	background-color: $text-color-light;
+	border-radius: $border-radius-md;
+	overflow: hidden;
+}
+
+.usage-progress {
+	height: 100%;
+	background-color: $primary-color;
+	transition: width $transition-speed;
+}
+
+.usage-error {
+	color: $error-color;
+	font-weight: bold;
+}
+
+.usage-note {
+	font-style: italic;
+	color: $text-color-light;
+	font-size: $base-font-size;
+	margin-top: $spacing-md;
+	padding: $spacing-md;
+	background-color: $secondary-color;
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $primary-color;
+}
+
+/* Extracted Lines Information Styles */
+.extracted-lines-info {
+	@include card;
+}
+
+.extracted-header {
+	font-weight: bold;
+	margin-bottom: $spacing-md;
+	color: $text-color;
+}
+
+.extracted-details {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+}
+
+.limit-warning {
+	@include error-message;
+	color: $error-color;
+	background-color: rgba($error-color, 0.1);
+	border-color: $error-color;
+	margin-top: $spacing-md;
+	font-weight: bold;
+}
+
+.limit-details {
+	margin-top: $spacing-xs;
+	font-size: $base-font-size;
+	padding: $spacing-xs;
+	background-color: rgba($error-color, 0.2);
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $error-color;
+}

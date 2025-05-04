@@ -1,0 +1,58 @@
+@import '../../../../styles/variables';
+
+.file-content-container {
+	border: $border-width-md solid $text-color-light;
+	border-radius: $border-radius-lg;
+	overflow: hidden;
+	margin-top: $spacing-xxxl;
+	box-shadow: $box-shadow-sm;
+}
+
+.file-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: $spacing-xl;
+	background-color: $text-color-lighter;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	border: none;
+	border-bottom: $border-width-md solid $text-color-light;
+	font: inherit;
+	outline: none;
+
+	h3 {
+		margin: 0;
+		font-size: $heading-font-size-lg;
+		color: $text-color;
+	}
+}
+
+.collapse-icon {
+	font-size: $heading-font-size-lg;
+	color: $text-color;
+}
+
+.file-content {
+	padding: $spacing-xl;
+	max-height: $file-content-max-height;
+	overflow-y: auto;
+	transition: max-height $transition-speed ease;
+	background-color: $text-color-lighter;
+
+	&.collapsed {
+		max-height: 0;
+		padding: 0 $spacing-xl;
+		overflow: hidden;
+	}
+}
+
+pre {
+	margin: 0;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	font-size: $base-font-size;
+	line-height: $base-line-height;
+	color: $text-color;
+}

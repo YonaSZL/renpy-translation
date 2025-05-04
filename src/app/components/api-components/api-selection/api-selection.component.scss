@@ -1,0 +1,26 @@
+@import '../../../../styles/variables';
+
+.form-group {
+	margin-bottom: $spacing-xl;
+
+	label {
+		display: block;
+		margin-bottom: $spacing-xs;
+		font-weight: bold;
+		color: $text-color-light;
+	}
+
+	select {
+		width: 100%;
+		padding: $spacing-md $spacing-xl;
+		border: $border-width-md solid $text-color-light;
+		border-radius: $border-radius-md;
+		font-size: $base-font-size;
+
+		&:focus {
+			outline: none;
+			border-color: $primary-color;
+			box-shadow: 0 0 0 $spacing-xs rgba($primary-color, 0.25);
+		}
+	}
+}

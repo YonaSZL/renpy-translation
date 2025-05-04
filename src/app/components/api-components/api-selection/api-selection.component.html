@@ -1,0 +1,10 @@
+<div class="form-group">
+	<label for="api-select">{{ 'SELECT_API' | translate }}</label>
+	<select
+		(change)="onApiChange()"
+		[(ngModel)]="selectedApi"
+		[attr.aria-label]="'SELECT_API' | translate"
+		id="api-select">
+		<option *ngFor="let api of apis" [value]="api.api">{{ api.name }}</option>
+	</select>
+</div>

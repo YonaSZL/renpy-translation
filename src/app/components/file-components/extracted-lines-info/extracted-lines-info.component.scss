@@ -1,0 +1,39 @@
+@import '../../../../styles/variables';
+
+:host {
+	display: block;
+}
+
+.extracted-lines-info {
+	@include card;
+}
+
+.extracted-header {
+	font-weight: bold;
+	margin-bottom: $spacing-md;
+	color: $text-color;
+}
+
+.extracted-details {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+}
+
+.limit-warning {
+	@include error-message;
+	color: $error-color;
+	background-color: rgba($error-color, 0.1);
+	border-color: $error-color;
+	margin-top: $spacing-md;
+	font-weight: bold;
+}
+
+.limit-details {
+	margin-top: $spacing-xs;
+	font-size: $base-font-size;
+	padding: $spacing-xs;
+	background-color: rgba($error-color, 0.2);
+	border-radius: $border-radius-md;
+	border-left: $border-width-xl solid $error-color;
+}

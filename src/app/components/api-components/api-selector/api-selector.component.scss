@@ -1,0 +1,83 @@
+@import '../../../../styles/variables';
+
+.api-selector-container {
+	background-color: $text-color-lighter;
+	border-radius: $border-radius-lg;
+	padding: $spacing-xxxl;
+	margin-bottom: $spacing-xxxl;
+	box-shadow: $box-shadow-sm;
+
+	h3 {
+		margin-top: 0;
+		margin-bottom: $spacing-xxxl;
+		color: $text-color;
+	}
+}
+
+.form-group {
+	margin-bottom: $spacing-xl;
+
+	label {
+		display: block;
+		margin-bottom: $spacing-xs;
+		font-weight: bold;
+		color: $text-color-light;
+	}
+
+	select,
+	input {
+		width: 100%;
+		padding: $spacing-md $spacing-xl;
+		border: $border-width-md solid $text-color-light;
+		border-radius: $border-radius-md;
+		font-size: $base-font-size;
+
+		&:focus {
+			outline: none;
+			border-color: $primary-color;
+			box-shadow: 0 0 0 $spacing-xs rgba($primary-color, 0.25);
+		}
+	}
+}
+
+.input-with-button,
+.input-container {
+	display: flex;
+	gap: $spacing-xl;
+
+	input {
+		flex: 1;
+	}
+}
+
+.fetch-button,
+.submit-button {
+	@include bootstrap-button;
+}
+
+.submit-button {
+	margin-top: $spacing-xl;
+	width: 100%;
+	padding: $spacing-xl;
+}
+
+.default-language-message {
+	display: block;
+	margin-top: $spacing-xs;
+	font-size: $extra-small-font-size;
+	color: $text-color-light;
+	font-style: italic;
+}
+
+.loading-indicator {
+	margin-top: $spacing-xl;
+	color: $primary-color;
+	font-style: italic;
+}
+
+.error-message {
+	@include error-message;
+	background-color: rgba($error-color, 0.1);
+	border-color: $error-color;
+	color: $error-color;
+}

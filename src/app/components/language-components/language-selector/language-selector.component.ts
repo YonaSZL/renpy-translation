@@ -4,15 +4,15 @@ import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {HttpClient} from '@angular/common/http';
 import {forkJoin, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
-import {LanguageLocalizationService} from '../../services/language-localization.service';
-import {SupportedLanguage} from '../../models/supported-language.model';
+import {LanguageLocalizationService} from '../../../services/language-localization.service';
+import {SupportedLanguage} from '../../../models/supported-language.model';
 
 @Component({
 	selector: 'app-language-selector',
 	standalone: true,
 	imports: [CommonModule, TranslateModule],
 	templateUrl: './language-selector.component.html',
-	styleUrl: './language-selector.component.css'
+	styleUrl: './language-selector.component.scss'
 })
 export class LanguageSelectorComponent implements OnInit {
 	languages: SupportedLanguage[] = [];

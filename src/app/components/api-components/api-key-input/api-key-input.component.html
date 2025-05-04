@@ -1,0 +1,12 @@
+<div class="form-group">
+	<label for="api-key">{{ 'API_KEY' | translate }}</label>
+	<div class="input-container">
+		<input
+			(input)="onApiKeyChange()"
+			[(ngModel)]="apiKey"
+			[attr.aria-label]="'API_KEY' | translate"
+			[attr.placeholder]="'ENTER_API_KEY' | translate"
+			id="api-key"
+			type="text">
+	</div>
+</div>
