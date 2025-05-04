@@ -1,22 +1,26 @@
-<section class="drag-drop-area"
-     [attr.aria-label]="'ARIA_FILE_UPLOAD_AREA' | translate"
-     [class.active]="isDragOver"
-     (dragover)="onDragOver($event)"
-     (dragleave)="onDragLeave($event)"
-     (drop)="onDrop($event)">
-  <div class="drag-drop-content">
-    <div class="icon">
-      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNjQiIHdpZHRoPSI2NCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTkuMzUgMTAuMDRDMTguNjcgNi41OSAxNS42NCA0IDEyIDQgOS4xMSA0IDYuNiA1LjY0IDUuMzUgOC4wNCAyLjM0IDguMzYgMCAxMC45MSAwIDE0YzAgMy4zMSAyLjY5IDYgNiA2aDEzYzIuNzYgMCA1LTIuMjQgNS01IDAtMi42NC0yLjA1LTQuNzgtNC42NS00Ljk2ek0xNCAxM3Y0aC00di00SDdsNS01IDUgNWgtM3oiLz48L3N2Zz4="
-           height="64"
-           width="64"
-           alt="Upload icon">
-    </div>
-    <h3>{{ 'DRAG_DROP_FILES' | translate }}</h3>
-    <p class="file-type-info">{{ 'ONLY_RPY_FILES' | translate }}</p>
-    <button class="browse-button" (click)="triggerFileInput()">{{ 'BROWSE_FILES' | translate }}</button>
-    <input type="file" #fileInput style="display: none" accept=".rpy" (change)="onFileSelected($event)" [attr.aria-label]="'ARIA_FILE_INPUT' | translate">
-    <div *ngIf="showError" class="error-message" role="alert">
-      {{ errorMessage }}
-    </div>
-  </div>
+<section (dragleave)="onDragLeave($event)"
+		 (dragover)="onDragOver($event)"
+		 (drop)="onDrop($event)"
+		 [attr.aria-label]="'ARIA_FILE_UPLOAD_AREA' | translate"
+		 [class.active]="isDragOver"
+		 class="drag-drop-area">
+	<div class="drag-drop-content">
+		<div class="icon">
+			<img
+				alt="Upload icon"
+				height="64"
+				src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNjQiIHdpZHRoPSI2NCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTkuMzUgMTAuMDRDMTguNjcgNi41OSAxNS42NCA0IDEyIDQgOS4xMSA0IDYuNiA1LjY0IDUuMzUgOC4wNCAyLjM0IDguMzYgMCAxMC45MSAwIDE0YzAgMy4zMSAyLjY5IDYgNiA2aDEzYzIuNzYgMCA1LTIuMjQgNS01IDAtMi42NC0yLjA1LTQuNzgtNC42NS00Ljk2ek0xNCAxM3Y0aC00di00SDdsNS01IDUgNWgtM3oiLz48L3N2Zz4="
+				width="64">
+		</div>
+		<h3>{{ 'DRAG_DROP_FILES' | translate }}</h3>
+		<p class="file-type-info">{{ 'ONLY_RPY_FILES' | translate }}</p>
+		<button (click)="triggerFileInput()" class="browse-button">{{ 'BROWSE_FILES' | translate }}</button>
+		<input #fileInput (change)="onFileSelected($event)" [attr.aria-label]="'ARIA_FILE_INPUT' | translate"
+			   accept=".rpy"
+			   style="display: none"
+			   type="file">
+		<div *ngIf="showError" class="error-message" role="alert">
+			{{ errorMessage }}
+		</div>
+	</div>
 </section>

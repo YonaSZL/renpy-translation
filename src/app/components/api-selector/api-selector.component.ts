@@ -1,205 +1,250 @@
-import { Component, EventEmitter, OnInit, OnDestroy, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { TranslationApiService, SupportedLanguage } from '../../services/translation-api.service';
-import { catchError, finalize } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
-
-interface TranslationApi {
-  id: string;
-  name: string;
-}
-
-interface LanguageOption {
-  code: string;
-  name: string;
-}
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TranslationApiService} from '../../services/translation-api.service';
+import {catchError, finalize} from 'rxjs/operators';
+import {of, Subscription} from 'rxjs';
+import {LanguageLocalizationService} from '../../services/language-localization.service';
+import {SupportedLanguage} from '../../models/supported-language.model';
+import {ApiDetails} from '../../models/api-details';
 
 @Component({
-  selector: 'app-api-selector',
-  standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
-  templateUrl: './api-selector.component.html',
-  styleUrl: './api-selector.component.css'
+	selector: 'app-api-selector',
+	standalone: true,
+	imports: [CommonModule, FormsModule, TranslateModule],
+	templateUrl: './api-selector.component.html',
+	styleUrl: './api-selector.component.css'
 })
 export class ApiSelectorComponent implements OnInit, OnDestroy {
-  private langChangeSubscription: Subscription | null = null;
-  apis: TranslationApi[] = [
-    { id: 'deepl', name: 'DeepL' },
-    { id: 'google', name: 'Google Translation' },
-    { id: 'azure', name: 'Azure' }
-  ];
+	apis: ApiDetails[] = [];
+	selectedApi: string = 'deepl-free';
+	apiKey: string = '';
+	availableLanguages: SupportedLanguage[] = [];
+	selectedLanguage: string = '';
+	currentPageLanguage: string = '';
+	isLoading: boolean = false;
+	errorMessage: string = '';
+	@Output() apiSelected = new EventEmitter<ApiDetails>();
+	private langChangeSubscription: Subscription | null = null;
 
-  selectedApi: string = 'deepl';
-  apiKey: string = '';
-  availableLanguages: LanguageOption[] = [];
-  selectedLanguage: string = '';
-  currentPageLanguage: string = '';
-  isLoading: boolean = false;
-  errorMessage: string = '';
+	constructor(
+		private readonly translateService: TranslateService,
+		private readonly translationApiService: TranslationApiService,
+		public readonly languageLocalizationService: LanguageLocalizationService
+	) {
+	}
 
-  @Output() apiSelected = new EventEmitter<{ api: string; key: string; language: string }>();
+	initializeApis(): void {
+		this.apis = [
+			{api: 'deepl-free', name: `DeepL (${this.translateService.instant('FREE')})`},
+			{api: 'google-free', name: `Google Translate (${this.translateService.instant('FREE')})`},
+		];
+	}
 
-  constructor(
-    private readonly translateService: TranslateService,
-    private readonly translationApiService: TranslationApiService
-  ) {}
+	ngOnInit(): void {
+		this.currentPageLanguage = this.translateService.currentLang || this.translateService.defaultLang || 'en';
+		this.initializeApis();
 
-  ngOnInit(): void {
-    this.currentPageLanguage = this.translateService.currentLang || this.translateService.defaultLang || 'en';
-    this.onApiChange();
+		// Initialize with default values and apply settings
+		this.onApiChange();
 
-    this.langChangeSubscription = this.translateService.onLangChange.subscribe(event => {
-      this.currentPageLanguage = event.lang;
-      this.updateDefaultOption();
-    });
-  }
+		// For Google Free API, onSubmit is called in onApiChange
+		// For DeepL API, onSubmit is called after fetching languages
 
-  ngOnDestroy(): void {
-    if (this.langChangeSubscription) {
-      this.langChangeSubscription.unsubscribe();
-      this.langChangeSubscription = null;
-    }
-  }
+		this.langChangeSubscription = this.translateService.onLangChange.subscribe(event => {
+			this.currentPageLanguage = event.lang;
+			this.updateDefaultOption();
+			this.initializeApis();
+			this.updateLanguageNames();
 
-  onApiChange(): void {
-    this.errorMessage = '';
-    this.isLoading = true;
-    this.availableLanguages = [];
+			// Apply settings when language changes
+			this.onSubmit();
+		});
+	}
 
-    this.availableLanguages.push({
-      code: 'default',
-      name: `${this.translateService.instant('DEFAULT')} (${this.getLanguageName(this.currentPageLanguage)})`
-    });
+	ngOnDestroy(): void {
+		if (this.langChangeSubscription) {
+			this.langChangeSubscription.unsubscribe();
+			this.langChangeSubscription = null;
+		}
+	}
 
-    this.selectedLanguage = 'default';
+	onApiChange(): void {
+		this.errorMessage = '';
+		this.isLoading = true;
+		this.availableLanguages = [];
 
-    if (!this.apiKey) {
-      this.isLoading = false;
-      return;
-    }
+		this.availableLanguages.push({
+			code: 'default',
+			name: `${this.translateService.instant('DEFAULT')} (${this.languageLocalizationService.getLanguageName(this.currentPageLanguage)})`
+		});
 
-    switch (this.selectedApi) {
-      case 'deepl':
-        this.fetchDeeplLanguages();
-        break;
-      case 'google':
-        this.fetchGoogleLanguages();
-        break;
-      case 'azure':
-        this.fetchAzureLanguages();
-        break;
-      default:
-        this.isLoading = false;
-        this.errorMessage = 'Unknown API selected';
-    }
-  }
+		this.selectedLanguage = 'default';
 
-  private fetchDeeplLanguages(): void {
-    this.translationApiService.fetchDeeplSupportedLanguages(this.apiKey)
-      .pipe(
-        catchError(error => {
-          this.errorMessage = error.message ?? 'Failed to fetch languages from DeepL API';
-          return of([]);
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        })
-      )
-      .subscribe(languages => {
-        this.addLanguagesToAvailable(languages);
-      });
-  }
+		// Special case for Google Translate (Free) which doesn't require an API key
+		if (this.selectedApi === 'google-free') {
+			this.fetchLanguages(this.selectedApi);
+			// Apply settings immediately for Google Free
+			this.onSubmit();
+			return;
+		}
 
-  private fetchGoogleLanguages(): void {
-    this.translationApiService.fetchGoogleSupportedLanguages(this.apiKey)
-      .pipe(
-        catchError(error => {
-          this.errorMessage = error.message ?? 'Failed to fetch languages from Google Translation API';
-          return of([]);
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        })
-      )
-      .subscribe(languages => {
-        this.addLanguagesToAvailable(languages);
-      });
-  }
+		if (!this.apiKey) {
+			this.isLoading = false;
+			return;
+		}
 
-  private fetchAzureLanguages(): void {
-    this.translationApiService.fetchAzureSupportedLanguages(this.apiKey)
-      .pipe(
-        catchError(error => {
-          this.errorMessage = error.message ?? 'Failed to fetch languages from Azure Translator API';
-          return of([]);
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        })
-      )
-      .subscribe(languages => {
-        this.addLanguagesToAvailable(languages);
-      });
-  }
+		if (['deepl-free'].includes(this.selectedApi)) {
+			this.fetchLanguages(this.selectedApi);
+		} else {
+			this.isLoading = false;
+			this.errorMessage = 'Unknown API selected';
+		}
+	}
 
-  private addLanguagesToAvailable(languages: SupportedLanguage[]): void {
-    languages.forEach(lang => {
-      if (lang.code !== 'default' && !this.availableLanguages.some(l => l.code === lang.code)) {
-        this.availableLanguages.push(lang);
-      }
-    });
-  }
+	onApiKeyChange(): void {
+		// Debounce the API key input to avoid too many requests
+		if (this.apiKeyTimeout) {
+			clearTimeout(this.apiKeyTimeout);
+		}
 
-  private updateDefaultOption(): void {
-    const defaultOption = this.availableLanguages.find(lang => lang.code === 'default');
+		this.apiKeyTimeout = setTimeout(() => {
+			if (this.apiKey && this.apiKey.length > 0) {
+				this.onApiChange();
+			} else {
+				// If API key is empty, reset available languages to just the default option
+				// for DeepL API which requires a key
+				if (this.selectedApi === 'deepl-free') {
+					this.availableLanguages = [];
+					// Add only the default language option
+					this.availableLanguages.push({
+						code: 'default',
+						name: `${this.translateService.instant('DEFAULT')} (${this.languageLocalizationService.getLanguageName(this.currentPageLanguage)})`
+					});
+					this.selectedLanguage = 'default';
+				}
 
-    const defaultText = this.translateService.instant('DEFAULT');
-    const languageName = this.getLanguageName(this.currentPageLanguage);
+				// Call onSubmit to notify parent component
+				// This is important for APIs that require a key (like DeepL)
+				this.onSubmit();
+			}
+		}, 500); // Wait for 500ms after the user stops typing
+	}
 
-    if (defaultOption) {
-      defaultOption.name = `${defaultText} (${languageName})`;
-    } else {
-      this.availableLanguages.unshift({
-        code: 'default',
-        name: `${defaultText} (${languageName})`
-      });
-    }
-  }
+	private apiKeyTimeout: any;
 
-  getLanguageName(code: string): string {
-    const codeToKey: { [key: string]: string } = {
-      'en': 'ENGLISH',
-      'fr': 'FRENCH',
-      'es': 'SPANISH',
-      'de': 'GERMAN',
-      'it': 'ITALIAN',
-      'pt': 'PORTUGUESE',
-      'ru': 'RUSSIAN',
-      'zh': 'CHINESE',
-      'ja': 'JAPANESE',
-      'ko': 'KOREAN',
-      'hi': 'HINDI',
-      'pl': 'POLISH',
-      'nl': 'DUTCH',
-      'uk': 'UKRAINIAN',
-      'sv': 'SWEDISH',
-      'ro': 'ROMANIAN'
-    };
+	onSubmit(): void {
+		// Check if we have valid settings to apply
+		if (!this.selectedLanguage) {
+			return;
+		}
 
-    const translationKey = codeToKey[code.toLowerCase()] || code.toUpperCase();
-    const translatedName = this.translateService.instant(translationKey);
-    return translatedName !== translationKey ? translatedName : code.toUpperCase();
-  }
+		// Note: We're removing the early return for DeepL with empty API key
+		// to ensure the parent component is notified when the API key is erased
+		// This allows the file-translation component to update its state accordingly
 
-  onSubmit(): void {
-    const language = this.selectedLanguage === 'default' ? this.currentPageLanguage : this.selectedLanguage;
+		const language = this.selectedLanguage === 'default' ? this.currentPageLanguage : this.selectedLanguage;
 
-    this.apiSelected.emit({
-      api: this.selectedApi,
-      key: this.apiKey,
-      language: language
-    });
-  }
+		// For Google Translate (Free), we don't need an API key
+		const apiKey = this.selectedApi === 'google-free' ? '' : this.apiKey;
+
+		const selectedApiObj = this.apis.find(api => api.api === this.selectedApi);
+
+		// Emit the selected API details
+		this.apiSelected.emit({
+			api: this.selectedApi,
+			key: apiKey,
+			name: selectedApiObj?.name ?? this.selectedApi,
+			language
+		});
+	}
+
+	private fetchLanguages(api: string): void {
+		let apiMethod;
+		let apiDisplayName;
+
+		switch (api) {
+			case 'deepl-free':
+				apiMethod = this.translationApiService.fetchDeeplSupportedLanguages(this.apiKey);
+				apiDisplayName = 'DeepL Free API';
+				break;
+			case 'google-free':
+				apiMethod = this.translationApiService.fetchGoogleFreeLanguages();
+				apiDisplayName = 'Google Translate';
+				break;
+			default:
+				this.errorMessage = 'Unknown API selected';
+				this.isLoading = false;
+				return;
+		}
+
+		apiMethod
+			.pipe(
+				catchError(error => {
+					this.errorMessage = error.message ?? `Failed to fetch languages from ${apiDisplayName}`;
+					return of([]);
+				}),
+				finalize(() => {
+					this.isLoading = false;
+				})
+			)
+			.subscribe(languages => {
+				this.addLanguagesToAvailable(languages);
+				this.updateLanguageNames();
+
+				// Apply settings immediately after fetching languages
+				if (this.selectedApi === 'deepl-free' && this.apiKey) {
+					this.onSubmit();
+				}
+			});
+	}
+
+	private addLanguagesToAvailable(languages: SupportedLanguage[]): void {
+		languages.forEach(lang => {
+			if (lang.code !== 'default' && !this.availableLanguages.some(l => l.code === lang.code)) {
+				this.availableLanguages.push(lang);
+			}
+		});
+	}
+
+	private updateDefaultOption(): void {
+		const defaultOption = this.availableLanguages.find(lang => lang.code === 'default');
+
+		const defaultText = this.translateService.instant('DEFAULT');
+		const languageName = this.languageLocalizationService.getLanguageName(this.currentPageLanguage);
+
+		if (defaultOption) {
+			defaultOption.name = `${defaultText} (${languageName})`;
+		} else {
+			this.availableLanguages.unshift({
+				code: 'default',
+				name: `${defaultText} (${languageName})`
+			});
+		}
+	}
+
+	/**
+	 * Update language names based on the current language
+	 * This is called when the language changes to update the displayed language names
+	 */
+	private updateLanguageNames(): void {
+		// Skip if there are no languages to update
+		if (this.availableLanguages.length <= 1) {
+			return;
+		}
+
+		// Update each language name (except the default option)
+		for (let i = 0; i < this.availableLanguages.length; i++) {
+			const lang = this.availableLanguages[i];
+			if (lang.code !== 'default') {
+				// Try to get a translated name from our language service
+				const translatedName = this.languageLocalizationService.getLanguageNameFromCode(lang.code, lang.name);
+				this.availableLanguages[i] = {
+					...lang,
+					name: translatedName
+				};
+			}
+		}
+	}
 }

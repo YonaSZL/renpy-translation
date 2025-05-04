@@ -1,5 +1,5 @@
 <div class="language-selector">
-  <select [value]="currentLang" (change)="changeLanguage($event)" [attr.aria-label]="'LANGUAGE' | translate">
-    <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</option>
-  </select>
+	<select (change)="changeLanguage($event)" [attr.aria-label]="'LANGUAGE' | translate" [value]="currentLang">
+		<option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</option>
+	</select>
 </div>

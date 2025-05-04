@@ -1,0 +1,24 @@
+{
+  "/deepl-api": {
+    "target": "https://api-free.deepl.com",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/deepl-api": ""
+    },
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+    }
+  },
+  "/google-translate-api": {
+    "target": "https://translate.googleapis.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/google-translate-api": ""
+    }
+  }
+}

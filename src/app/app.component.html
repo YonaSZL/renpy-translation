@@ -1,9 +1,16 @@
 <app-language-selector (languageChanged)="onLanguageChanged($event)"></app-language-selector>
 
 <div class="container">
-  <app-file-upload (fileSelected)="handleFileSelected($event)"></app-file-upload>
-  <app-api-selector (apiSelected)="handleApiSelected($event)"></app-api-selector>
-  <app-file-viewer [fileName]="fileName" [fileContent]="fileContent"></app-file-viewer>
+	<app-file-upload (fileSelected)="handleFileSelected($event)"></app-file-upload>
+	<app-api-selector (apiSelected)="handleApiSelected($event)"></app-api-selector>
+	<app-file-translation
+		[apiKey]="apiKey"
+		[fileContent]="fileContent"
+		[fileName]="fileName"
+		[selectedApi]="selectedApi"
+		[targetLanguage]="targetLanguage">
+	</app-file-translation>
+	<app-file-viewer [fileContent]="fileContent" [fileName]="fileName"></app-file-viewer>
 </div>
 
-<router-outlet />
+<router-outlet/>
