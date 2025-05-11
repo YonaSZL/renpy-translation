@@ -151,6 +151,10 @@ export class RenpyFileParserService {
 						// The second commented line contains the text to translate
 						this.extractAndAddTextToTranslate(lines[i + 4], linesToTranslate);
 					}
+					// Skip if the line already has content between quotes (not empty quotes)
+					else if (secondLineAfterComments.includes('"') && !secondLineAfterComments.includes('""')) {
+						// Line already has translation, skip it
+					}
 				}
 				return i + 7; // Move beyond the block (2 commented lines + 2 lines to fill)
 			} else {
@@ -159,6 +163,10 @@ export class RenpyFileParserService {
 				if (firstLineAfterComments.includes('""')) {
 					// The second commented line contains the text to translate
 					this.extractAndAddTextToTranslate(lines[i + 4], linesToTranslate);
+				}
+				// Skip if the line already has content between quotes (not empty quotes)
+				else if (firstLineAfterComments.includes('"') && !firstLineAfterComments.includes('""')) {
+					// Line already has translation, skip it
 				}
 				return i + 6; // Move beyond the block (2 commented lines + 1 line to fill)
 			}
@@ -181,6 +189,10 @@ export class RenpyFileParserService {
 			// Check if the line contains empty quotes (to fill)
 			if (lineToFill.includes('""')) {
 				this.extractAndAddTextToTranslate(lines[i + 3], linesToTranslate);
+			}
+			// Skip if the line already has content between quotes (not empty quotes)
+			else if (lineToFill.includes('"') && !lineToFill.includes('""')) {
+				// Line already has translation, skip it
 			}
 		}
 		return i + 5; // Move beyond the block
@@ -234,6 +246,10 @@ export class RenpyFileParserService {
 				if (textToTranslate) {
 					linesToTranslate.push(textToTranslate);
 				}
+			}
+			// Skip if the "new" line already has content between quotes (not empty quotes)
+			else if (nextLine.startsWith('new "') && nextLine.includes('"') && !nextLine.endsWith('""') && nextLine !== 'new ""') {
+				// Line already has translation, skip it
 			}
 		}
 	}
