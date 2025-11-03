@@ -4,12 +4,20 @@ import {forkJoin, Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {SupportedLanguage} from '../models/supported-language.model';
 
+interface TranslationBatch {
+	timestamp: number;
+	character_count: number;
+}
+
 interface GoogleTranslateUsage {
 	character_count: number;
 	character_limit: number;
 	weekly_limit?: number;
 	daily_limit?: number;
 	file_char_limit?: number;
+	translation_batches?: TranslationBatch[];
+	daily_count?: number;
+	weekly_count?: number;
 }
 
 export interface GoogleTranslateUsageResult {
@@ -18,6 +26,10 @@ export interface GoogleTranslateUsageResult {
 	weekly_limit?: number;
 	daily_limit?: number;
 	file_char_limit?: number;
+	daily_count?: number;
+	weekly_count?: number;
+	monthly_count?: number;
+	translation_batches?: TranslationBatch[];
 	error?: string;
 }
 
@@ -48,17 +60,18 @@ export class GoogleTranslateService {
 	 * This is useful when the limits have changed
 	 */
 	resetUsageInLocalStorage(): void {
-		// Keep the current character count if it exists
+		// Keep the current translation batches if they exist
 		const currentUsage = this.getUsageFromLocalStorage();
-		const characterCount = currentUsage ? currentUsage.character_count : 0;
+		const translationBatches = currentUsage?.translation_batches || [];
 
 		// Save with updated limits
 		this.saveUsageToLocalStorage({
-			character_count: characterCount,
+			character_count: 0, // Will be recalculated based on batches
 			character_limit: this.GOOGLE_TRANSLATE_CHAR_LIMIT,
 			weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
 			daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
-			file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT
+			file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+			translation_batches: translationBatches
 		});
 	}
 
@@ -141,7 +154,7 @@ export class GoogleTranslateService {
 
 	/**
 	 * Check if adding new characters will exceed any API limits
-	 * @param currentCount Current character count
+	 * @param currentCount Current character count (not used, kept for backward compatibility)
 	 * @param additionalCount Additional character count to add
 	 * @param characterLimit The character limit (defaults to Google Translate limit)
 	 * @returns Object with willExceedLimit and willExceedFileLimit flags
@@ -153,26 +166,57 @@ export class GoogleTranslateService {
 	): { willExceedLimit: boolean, willExceedFileLimit: boolean } {
 		// Get current usage from local storage
 		const usage = this.getUsageFromLocalStorage() || {
-			character_count: currentCount,
+			character_count: 0,
 			character_limit: characterLimit,
 			weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
 			daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
-			file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT
+			file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+			translation_batches: []
 		};
 
+		// Calculate current counts based on time windows
+		const now = Date.now();
+		const oneDayMs = 24 * 60 * 60 * 1000;
+		const oneWeekMs = 7 * oneDayMs;
+
+		let monthlyCount = 0;
+		let weeklyCount = 0;
+		let dailyCount = 0;
+
+		if (usage.translation_batches) {
+			for (const batch of usage.translation_batches) {
+				const age = now - batch.timestamp;
+
+				// Add to monthly count if less than a month old
+				monthlyCount += batch.character_count;
+
+				// Add to weekly count if less than a week old
+				if (age < oneWeekMs) {
+					weeklyCount += batch.character_count;
+
+					// Add to daily count if less than a day old
+					if (age < oneDayMs) {
+						dailyCount += batch.character_count;
+					}
+				}
+			}
+		}
+
 		// Check if adding the new character count would exceed any limit
-		const projectedCount = currentCount + additionalCount;
 
 		// Check monthly limit
-		const exceedsMonthly = projectedCount > characterLimit;
+		const projectedMonthlyCount = monthlyCount + additionalCount;
+		const exceedsMonthly = projectedMonthlyCount > characterLimit;
 
 		// Check weekly limit
 		const weeklyLimit = usage.weekly_limit ?? this.GOOGLE_TRANSLATE_WEEKLY_LIMIT;
-		const exceedsWeekly = projectedCount > weeklyLimit;
+		const projectedWeeklyCount = weeklyCount + additionalCount;
+		const exceedsWeekly = projectedWeeklyCount > weeklyLimit;
 
 		// Check daily limit
 		const dailyLimit = usage.daily_limit ?? this.GOOGLE_TRANSLATE_DAILY_LIMIT;
-		const exceedsDaily = projectedCount > dailyLimit;
+		const projectedDailyCount = dailyCount + additionalCount;
+		const exceedsDaily = projectedDailyCount > dailyLimit;
 
 		// Check file character limit
 		const fileCharLimit = usage.file_char_limit ?? this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT;
@@ -186,12 +230,73 @@ export class GoogleTranslateService {
 
 
 	/**
+	 * Calculate current usage based on translation batches
+	 * @param usage The current usage data
+	 * @returns Updated usage data with adjusted counts based on time windows
+	 */
+	private calculateCurrentUsage(usage: GoogleTranslateUsage): GoogleTranslateUsage {
+		const now = Date.now();
+
+		// Initialize translation_batches if it doesn't exist
+		if (!usage.translation_batches) {
+			usage.translation_batches = [];
+		}
+
+		// Define time windows
+		const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+		const oneWeekMs = 7 * oneDayMs; // 7 days in milliseconds
+		const oneMonthMs = 30 * oneDayMs; // 30 days in milliseconds
+
+		// Filter batches to keep only those within the time windows
+		const validBatches = usage.translation_batches.filter(batch => {
+			return now - batch.timestamp < oneMonthMs;
+		});
+
+		// If any batches were removed, update the array
+		if (validBatches.length !== usage.translation_batches.length) {
+			usage.translation_batches = validBatches;
+		}
+
+		// Calculate counts for different time windows
+		let monthlyCount = 0;
+		let weeklyCount = 0;
+		let dailyCount = 0;
+
+		for (const batch of validBatches) {
+			const age = now - batch.timestamp;
+
+			// Add to monthly count (all valid batches)
+			monthlyCount += batch.character_count;
+
+			// Add to weekly count if less than a week old
+			if (age < oneWeekMs) {
+				weeklyCount += batch.character_count;
+			}
+
+			// Add to daily count if less than a day old
+			if (age < oneDayMs) {
+				dailyCount += batch.character_count;
+			}
+		}
+
+		// Update the usage object
+		usage.character_count = monthlyCount;
+
+		return usage;
+	}
+
+	/**
 	 * Get usage information from local storage
 	 * @returns GoogleTranslateUsage object or null if not found
 	 */
 	getUsageFromLocalStorage(): GoogleTranslateUsage | null {
 		const usageData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-		return usageData ? JSON.parse(usageData) : null;
+		if (!usageData) {
+			return null;
+		}
+
+		const usage = JSON.parse(usageData) as GoogleTranslateUsage;
+		return this.calculateCurrentUsage(usage);
 	}
 
 	/**
@@ -203,13 +308,27 @@ export class GoogleTranslateService {
 	}
 
 	/**
-	 * Update usage information in local storage by adding character count
+	 * Update usage information in local storage by adding a new translation batch
 	 * @param additionalCharCount Additional character count to add
 	 */
 	updateUsageInLocalStorage(additionalCharCount: number): void {
 		const currentUsage = this.getUsageFromLocalStorage();
 		if (currentUsage) {
+			// Initialize translation_batches if it doesn't exist
+			if (!currentUsage.translation_batches) {
+				currentUsage.translation_batches = [];
+			}
+
+			// Add a new batch with the current timestamp
+			currentUsage.translation_batches.push({
+				timestamp: Date.now(),
+				character_count: additionalCharCount
+			});
+
+			// Recalculate the total character count
 			currentUsage.character_count += additionalCharCount;
+
+			// Save the updated usage
 			this.saveUsageToLocalStorage(currentUsage);
 		}
 	}
@@ -221,18 +340,46 @@ export class GoogleTranslateService {
 	getUsage(): Observable<GoogleTranslateUsage> {
 		const usage = this.getUsageFromLocalStorage();
 		if (usage) {
-			// Ensure weekly, daily, and file character limits are set
+			// Ensure all limits are set
 			usage.weekly_limit ??= this.GOOGLE_TRANSLATE_WEEKLY_LIMIT;
 			usage.daily_limit ??= this.GOOGLE_TRANSLATE_DAILY_LIMIT;
 			usage.file_char_limit ??= this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT;
-			return of(usage);
+
+			// Calculate daily and weekly counts
+			const now = Date.now();
+			const oneDayMs = 24 * 60 * 60 * 1000;
+			const oneWeekMs = 7 * oneDayMs;
+
+			let dailyCount = 0;
+			let weeklyCount = 0;
+
+			if (usage.translation_batches) {
+				for (const batch of usage.translation_batches) {
+					const age = now - batch.timestamp;
+
+					// Add to weekly count if less than a week old
+					if (age < oneWeekMs) {
+						weeklyCount += batch.character_count;
+
+						// Add to daily count if less than a day old
+						if (age < oneDayMs) {
+							dailyCount += batch.character_count;
+						}
+					}
+				}
+			}
+
+			// Add calculated counts to the usage object for the UI
+			const result = { ...usage, daily_count: dailyCount, weekly_count: weeklyCount };
+			return of(result);
 		} else {
 			return of({
 				character_count: 0,
 				character_limit: this.GOOGLE_TRANSLATE_CHAR_LIMIT,
 				weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
 				daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
-				file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT
+				file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+				translation_batches: []
 			});
 		}
 	}
@@ -244,12 +391,17 @@ export class GoogleTranslateService {
 	fetchApiUsageWithEnhancedInfo(): Observable<GoogleTranslateUsageResult> {
 		return this.getUsage().pipe(
 			map(usage => {
+				// The getUsage method already calculates daily_count and weekly_count
 				const result: GoogleTranslateUsageResult = {
 					character_count: usage.character_count,
 					character_limit: usage.character_limit,
 					weekly_limit: usage.weekly_limit,
 					daily_limit: usage.daily_limit,
-					file_char_limit: usage.file_char_limit
+					file_char_limit: usage.file_char_limit,
+					daily_count: usage.daily_count,
+					weekly_count: usage.weekly_count,
+					monthly_count: usage.character_count, // Monthly count is the same as character_count
+					translation_batches: usage.translation_batches
 				};
 				return result;
 			}),
@@ -261,6 +413,10 @@ export class GoogleTranslateService {
 					weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
 					daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
 					file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+					daily_count: 0,
+					weekly_count: 0,
+					monthly_count: 0,
+					translation_batches: [],
 					error: 'Error fetching usage information'
 				});
 			})

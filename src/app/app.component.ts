@@ -8,6 +8,7 @@ import {
 } from './components/language-components/language-selector/language-selector.component';
 import {ApiSelectorComponent} from './components/api-components/api-selector/api-selector.component';
 import {FileTranslationComponent} from './components/file-components/file-translation/file-translation.component';
+import {FolderTranslationComponent} from './components/folder-components/folder-translation/folder-translation.component';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {Title} from '@angular/platform-browser';
 import {ApiDetails} from './models/api-details';
@@ -15,7 +16,7 @@ import {ApiDetails} from './models/api-details';
 @Component({
 	selector: 'app-root',
 	standalone: true,
-	imports: [RouterOutlet, CommonModule, FileUploadComponent, FileViewerComponent, LanguageSelectorComponent, ApiSelectorComponent, FileTranslationComponent, TranslateModule],
+ imports: [RouterOutlet, CommonModule, FileUploadComponent, FileViewerComponent, LanguageSelectorComponent, ApiSelectorComponent, FileTranslationComponent, FolderTranslationComponent, TranslateModule],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss'
 })
@@ -26,8 +27,9 @@ export class AppComponent implements OnInit {
 	selectedApi: string = '';
 	apiKey: string = '';
 	targetLanguage: string = '';
+	folderFiles: File[] = [];
 
-	constructor(
+constructor(
 		private readonly translateService: TranslateService,
 		private readonly titleService: Title
 	) {
@@ -51,7 +53,10 @@ export class AppComponent implements OnInit {
 		});
 	}
 
-	handleFileSelected(file: File): void {
+ handleFileSelected(file: File): void {
+		// Clear any previously selected folder context
+		this.folderFiles = [];
+
 		this.fileName = file.name;
 		const reader = new FileReader();
 
@@ -81,4 +86,22 @@ export class AppComponent implements OnInit {
 		// The user must explicitly request translation
 	}
 
+
+async handleFolderSelected(files: File[]): Promise<void> {
+		// If multiple files are provided, treat as folder translation; otherwise leave to single-file flow
+		if (!files || files.length === 0) {
+			return;
+		}
+		if (files.length === 1) {
+			// Delegate to single-file handler for backward compatibility
+			this.handleFileSelected(files[0]);
+			return;
+		}
+
+		// Prepare folder translation view, do not translate yet
+		this.folderFiles = files;
+		// Clear single-file context
+		this.fileContent = null;
+		this.fileName = '';
+	}
 }

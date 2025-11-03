@@ -1,16 +1,16 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables';
 
 .language-selector {
 	position: absolute;
-	top: $spacing-md;
-	right: $spacing-xxxl;
-	z-index: $z-index-dropdown;
+	top: variables.$spacing-md;
+	right: variables.$spacing-xxxl;
+	z-index: variables.$z-index-dropdown;
 
 	select {
-		padding: $spacing-xs $spacing-xl;
-		border-radius: $border-radius-md;
-		border: $border-width-md solid $text-color-light;
-		background-color: $secondary-color;
+		padding: variables.$spacing-xs variables.$spacing-xl;
+		border-radius: variables.$border-radius-md;
+		border: variables.$border-width-md solid variables.$text-color-light;
+		background-color: variables.$secondary-color;
 		cursor: pointer;
 	}
 }

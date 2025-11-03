@@ -60,6 +60,8 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 	// For tracking API usage changes
 	private previousCharacterCount: number = 0;
 	private countdownInterval: any = null;
+	// Control whether usage polling is allowed to retry (only after translation)
+	allowUsageRetry = signal<boolean>(false);
 
 	constructor(
 		private readonly snackBar: MatSnackBar,
@@ -89,13 +91,18 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 		// Fetch API usage information when API key changes or API is selected
 		if (changes['apiKey'] || changes['selectedApi']) {
 			if ((this.selectedApi === 'deepl-free' && this.apiKey) || this.selectedApi === 'google-free') {
+				// Initial fetch should be single-shot: no retries/backoff
+				this.allowUsageRetry.set(false);
 				this.fetchApiUsage();
 			}
 		}
 
-		// Update extracted lines information when file content changes
+		// Update extracted lines information when file content changes (e.g., file dragged)
 		if (changes['fileContent'] && this.fileContent) {
 			this.updateExtractedLinesInfo();
+			// After a file is dragged/loaded, perform a single usage check (no retries)
+			this.allowUsageRetry.set(false);
+			this.fetchApiUsage();
 		}
 	}
 
@@ -110,12 +117,16 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 
 		this.setupApiUsageFetch();
 
+ 	// Determine whether to allow retries (only after translation or when explicitly enabled)
+		const effectiveMaxRetries = this.allowUsageRetry() ? this.MAX_RETRY_ATTEMPTS : 0;
+		const prevCount = this.allowUsageRetry() ? this.previousCharacterCount : this.characterCount();
+
 		this.translationApiService.fetchApiUsage(
 			this.selectedApi,
 			this.apiKey,
-			this.previousCharacterCount,
+			prevCount,
 			this.retryCount(),
-			this.MAX_RETRY_ATTEMPTS
+			effectiveMaxRetries
 		).subscribe({
 			next: (result) => this.handleApiUsageResult(result),
 			error: (error) => this.handleApiUsageError(error)
@@ -412,12 +423,27 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 	 * @param result The API usage result
 	 */
 	private handleRetry(result: ApiUsageResult): void {
-		// Update retry count
-		this.retryCount.set(result.retryCount!);
+		// If retries are not allowed (e.g., initial fetch or file drag single-shot), stop immediately
+		if (!this.allowUsageRetry()) {
+			this.handleFetchComplete(result);
+			return;
+		}
 
-		// Schedule another check after 2 seconds
-		console.log(`Character count unchanged (${result.character_count}), retrying... (${result.retryCount}/${this.MAX_RETRY_ATTEMPTS})`);
-		setTimeout(() => this.fetchApiUsage(), 2000);
+		// Stop if we've reached or exceeded the cap
+		if (result.retryCount !== undefined && result.retryCount >= this.MAX_RETRY_ATTEMPTS) {
+			this.handleFetchComplete(result);
+			return;
+		}
+
+		// Update retry count and mark that we are in a retrying state to prevent resets
+		this.retryCount.set(result.retryCount!);
+		this.isUpdatingUsage.set(true);
+
+		// Calculate a small backoff to avoid tight loops (max 5s)
+		const delayMs = Math.min(2000 + 500 * Math.max(0, (result.retryCount ?? 1) - 1), 5000);
+
+		console.log(`Character count unchanged (${result.character_count}), retrying in ${Math.round(delayMs / 1000)}s... (${result.retryCount}/${this.MAX_RETRY_ATTEMPTS})`);
+		setTimeout(() => this.fetchApiUsage(), delayMs);
 	}
 
 	/**
@@ -427,6 +453,8 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 	private handleFetchComplete(result: ApiUsageResult): void {
 		// No need to retry or max retries reached
 		this.isUpdatingUsage.set(false);
+		// Disable further retries unless explicitly enabled by user actions (translation/file drag)
+		this.allowUsageRetry.set(false);
 
 		if (this.retryCount() > 0 && result.previousCharacterCount !== undefined) {
 			console.log(`Character count updated from ${result.previousCharacterCount} to ${result.character_count} after ${this.retryCount()} retries.`);
@@ -472,6 +500,8 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 		this.countdownValue.set(5);
 		this.countdownProgress.set(100);
 		this.isUpdatingUsage.set(true);
+		// Allow a bounded retry cycle after translation only
+		this.allowUsageRetry.set(true);
 		this.retryCount.set(0);
 
 		// Clear any existing interval

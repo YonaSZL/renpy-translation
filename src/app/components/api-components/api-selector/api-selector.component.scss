@@ -1,41 +1,41 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables';
 
 .api-selector-container {
-	background-color: $text-color-lighter;
-	border-radius: $border-radius-lg;
-	padding: $spacing-xxxl;
-	margin-bottom: $spacing-xxxl;
-	box-shadow: $box-shadow-sm;
+	background-color: variables.$text-color-lighter;
+	border-radius: variables.$border-radius-lg;
+	padding: variables.$spacing-xxxl;
+	margin-bottom: variables.$spacing-xxxl;
+	box-shadow: variables.$box-shadow-sm;
 
 	h3 {
 		margin-top: 0;
-		margin-bottom: $spacing-xxxl;
-		color: $text-color;
+		margin-bottom: variables.$spacing-xxxl;
+		color: variables.$text-color;
 	}
 }
 
 .form-group {
-	margin-bottom: $spacing-xl;
+	margin-bottom: variables.$spacing-xl;
 
 	label {
 		display: block;
-		margin-bottom: $spacing-xs;
+		margin-bottom: variables.$spacing-xs;
 		font-weight: bold;
-		color: $text-color-light;
+		color: variables.$text-color-light;
 	}
 
 	select,
 	input {
 		width: 100%;
-		padding: $spacing-md $spacing-xl;
-		border: $border-width-md solid $text-color-light;
-		border-radius: $border-radius-md;
-		font-size: $base-font-size;
+		padding: variables.$spacing-md variables.$spacing-xl;
+		border: variables.$border-width-md solid variables.$text-color-light;
+		border-radius: variables.$border-radius-md;
+		font-size: variables.$base-font-size;
 
 		&:focus {
 			outline: none;
-			border-color: $primary-color;
-			box-shadow: 0 0 0 $spacing-xs rgba($primary-color, 0.25);
+			border-color: variables.$primary-color;
+			box-shadow: 0 0 0 variables.$spacing-xs rgba(variables.$primary-color, 0.25);
 		}
 	}
 }
@@ -43,7 +43,7 @@
 .input-with-button,
 .input-container {
 	display: flex;
-	gap: $spacing-xl;
+	gap: variables.$spacing-xl;
 
 	input {
 		flex: 1;
@@ -52,32 +52,32 @@
 
 .fetch-button,
 .submit-button {
-	@include bootstrap-button;
+	@include variables.bootstrap-button;
 }
 
 .submit-button {
-	margin-top: $spacing-xl;
+	margin-top: variables.$spacing-xl;
 	width: 100%;
-	padding: $spacing-xl;
+	padding: variables.$spacing-xl;
 }
 
 .default-language-message {
 	display: block;
-	margin-top: $spacing-xs;
-	font-size: $extra-small-font-size;
-	color: $text-color-light;
+	margin-top: variables.$spacing-xs;
+	font-size: variables.$extra-small-font-size;
+	color: variables.$text-color-light;
 	font-style: italic;
 }
 
 .loading-indicator {
-	margin-top: $spacing-xl;
-	color: $primary-color;
+	margin-top: variables.$spacing-xl;
+	color: variables.$primary-color;
 	font-style: italic;
 }
 
 .error-message {
-	@include error-message;
-	background-color: rgba($error-color, 0.1);
-	border-color: $error-color;
-	color: $error-color;
+	@include variables.error-message;
+	background-color: rgba(variables.$error-color, 0.1);
+	border-color: variables.$error-color;
+	color: variables.$error-color;
 }

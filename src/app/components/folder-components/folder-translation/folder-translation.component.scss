@@ -1,0 +1,41 @@
+.folder-translation {
+  margin-top: 16px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.progress {
+  position: relative;
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress .bar {
+  height: 100%;
+  background: #4caf50;
+  width: 0;
+}
+
+.progress .label {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.files {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.files th, .files td {
+  border-bottom: 1px solid #eee;
+  padding: 6px 8px;
+  text-align: left;
+}

@@ -1,3 +1,4 @@
+@use "sass:color";
 // Color Variables
 $primary-color: #4285f4;
 $secondary-color: #f5f5f5;
@@ -77,11 +78,11 @@ $large-padding: 2.5rem;
 	color: $secondary-color;
 
 	&:hover {
-		background-color: darken($primary-color, 10%);
+		background-color: color.adjust($primary-color, $lightness: -10%);
 	}
 
 	&:active {
-		background-color: darken($primary-color, 20%);
+		background-color: color.adjust($primary-color, $lightness: -20%);
 	}
 
 	&:disabled {
@@ -95,7 +96,7 @@ $large-padding: 2.5rem;
 	color: $secondary-color;
 
 	&:hover {
-		background-color: darken($primary-color, 10%);
+		background-color: color.adjust($primary-color, $lightness: -10%);
 	}
 
 	&:disabled {

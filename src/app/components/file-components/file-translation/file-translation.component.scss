@@ -1,151 +1,151 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables';
 
 .file-translation-container {
 	display: flex;
 	justify-content: center;
 	flex-direction: column;
-	gap: $spacing-xxl;
-	padding: $spacing-xxl;
-	background-color: $secondary-color;
-	border-radius: $border-radius-lg;
-	margin: $spacing-xxl 0 $spacing-xxxl;
+	gap: variables.$spacing-xxl;
+	padding: variables.$spacing-xxl;
+	background-color: variables.$secondary-color;
+	border-radius: variables.$border-radius-lg;
+	margin: variables.$spacing-xxl 0 variables.$spacing-xxxl;
 }
 
 .translate-button {
-	@include primary-button;
-	gap: $spacing-md;
-	padding: $spacing-xl $spacing-xxxl;
-	font-size: $base-font-size;
+	@include variables.primary-button;
+	gap: variables.$spacing-md;
+	padding: variables.$spacing-xl variables.$spacing-xxxl;
+	font-size: variables.$base-font-size;
 	width: auto;
 	margin: 0 auto;
 
 	mat-icon {
-		font-size: $large-font-size;
-		height: $large-font-size;
-		width: $large-font-size;
+		font-size: variables.$large-font-size;
+		height: variables.$large-font-size;
+		width: variables.$large-font-size;
 	}
 }
 
 /* API Usage Information Styles */
 .api-usage-info {
-	@include card;
+	@include variables.card;
 }
 
 .loading-usage {
 	font-style: italic;
-	color: $text-color-light;
+	color: variables.$text-color-light;
 }
 
 .updating-usage {
 	font-weight: bold;
-	color: $primary-color;
-	background-color: rgba($primary-color, 0.1);
-	padding: $spacing-md;
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $primary-color;
+	color: variables.$primary-color;
+	background-color: rgba(variables.$primary-color, 0.1);
+	padding: variables.$spacing-md;
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$primary-color;
 }
 
 .countdown-bar {
-	height: $spacing-md;
-	background-color: $text-color-light;
-	border-radius: $border-radius-md;
+	height: variables.$spacing-md;
+	background-color: variables.$text-color-light;
+	border-radius: variables.$border-radius-md;
 	overflow: hidden;
-	margin-top: $spacing-md;
+	margin-top: variables.$spacing-md;
 }
 
 .countdown-progress {
 	height: 100%;
-	background-color: $primary-color;
-	transition: width $transition-speed;
+	background-color: variables.$primary-color;
+	transition: width variables.$transition-speed;
 }
 
 .usage-header {
 	font-weight: bold;
-	margin-bottom: $spacing-md;
-	color: $text-color;
+	margin-bottom: variables.$spacing-md;
+	color: variables.$text-color;
 }
 
 .usage-details {
 	display: flex;
 	flex-direction: column;
-	gap: $spacing-xxl;
+	gap: variables.$spacing-xxl;
 }
 
 .limit-section {
 	display: flex;
 	flex-direction: column;
-	gap: $spacing-xs;
-	padding: $spacing-md;
-	background-color: $secondary-color;
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $primary-color;
+	gap: variables.$spacing-xs;
+	padding: variables.$spacing-md;
+	background-color: variables.$secondary-color;
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$primary-color;
 }
 
 .limit-label {
 	font-weight: bold;
-	color: $text-color;
+	color: variables.$text-color;
 }
 
 .usage-bar {
-	height: $spacing-md;
-	background-color: $text-color-light;
-	border-radius: $border-radius-md;
+	height: variables.$spacing-md;
+	background-color: variables.$text-color-light;
+	border-radius: variables.$border-radius-md;
 	overflow: hidden;
 }
 
 .usage-progress {
 	height: 100%;
-	background-color: $primary-color;
-	transition: width $transition-speed;
+	background-color: variables.$primary-color;
+	transition: width variables.$transition-speed;
 }
 
 .usage-error {
-	color: $error-color;
+	color: variables.$error-color;
 	font-weight: bold;
 }
 
 .usage-note {
 	font-style: italic;
-	color: $text-color-light;
-	font-size: $base-font-size;
-	margin-top: $spacing-md;
-	padding: $spacing-md;
-	background-color: $secondary-color;
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $primary-color;
+	color: variables.$text-color-light;
+	font-size: variables.$base-font-size;
+	margin-top: variables.$spacing-md;
+	padding: variables.$spacing-md;
+	background-color: variables.$secondary-color;
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$primary-color;
 }
 
 /* Extracted Lines Information Styles */
 .extracted-lines-info {
-	@include card;
+	@include variables.card;
 }
 
 .extracted-header {
 	font-weight: bold;
-	margin-bottom: $spacing-md;
-	color: $text-color;
+	margin-bottom: variables.$spacing-md;
+	color: variables.$text-color;
 }
 
 .extracted-details {
 	display: flex;
 	flex-direction: column;
-	gap: $spacing-md;
+	gap: variables.$spacing-md;
 }
 
 .limit-warning {
-	@include error-message;
-	color: $error-color;
-	background-color: rgba($error-color, 0.1);
-	border-color: $error-color;
-	margin-top: $spacing-md;
+	@include variables.error-message;
+	color: variables.$error-color;
+	background-color: rgba(variables.$error-color, 0.1);
+	border-color: variables.$error-color;
+	margin-top: variables.$spacing-md;
 	font-weight: bold;
 }
 
 .limit-details {
-	margin-top: $spacing-xs;
-	font-size: $base-font-size;
-	padding: $spacing-xs;
-	background-color: rgba($error-color, 0.2);
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $error-color;
+	margin-top: variables.$spacing-xs;
+	font-size: variables.$base-font-size;
+	padding: variables.$spacing-xs;
+	background-color: rgba(variables.$error-color, 0.2);
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$error-color;
 }

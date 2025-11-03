@@ -215,35 +215,25 @@ export class TranslationApiService {
 	fetchDeeplSupportedLanguages(apiKey: string): Observable<SupportedLanguage[]> {
 		const apiType = 'DeepL Free API';
 		return this.fetchLanguagesFromApi(apiType, apiKey, () => {
+			// Use the local proxy to avoid CORS issues and to keep a single origin.
+			// Match the pattern used elsewhere in the app for DeepL endpoints.
+			const endpoint = `/deepl-api/v2/languages`;
+			const params = { params: { auth_key: apiKey, type: 'target' } } as const;
 
-			const endpoint = `https://api-free.deepl.com/v2/languages?auth_key=${apiKey}`;
-			console.log(`Using endpoint: ${endpoint} for ${apiType}`);
-
-			// Simple GET request with minimal options
-			return this.httpClient.get<any>(endpoint)
+			return this.httpClient.get<any[]>(endpoint, params)
 				.pipe(
 					map(response => {
-						console.log('DeepL API response:', response);
-						return response;
+						// DeepL returns an array like: [{ language: 'EN', name: 'English' }, ...]
+						return response.map((lang: any) => {
+							const code = (lang.language || '').toString().toLowerCase();
+							const displayName = this.languageLocalizationService.getLanguageNameFromCode(code, lang.name);
+							return { code, name: displayName } as SupportedLanguage;
+						});
 					}),
 					catchError(error => {
-						console.error(`Error with ${endpoint}:`, error);
-						throw error;
-					}),
-					map(response => {
-						// DeepL API returns an array of language objects with 'language' and 'name' properties
-						// Map the language codes to our internal codes and translate the names
-						return response.map((lang: any) => {
-							const code = lang.language.toLowerCase();
-							// Try to get a translated name from our language service
-							// If the language code is in our mapping, use the translated name
-							// Otherwise, use the name from the API
-							const translatedName = this.languageLocalizationService.getLanguageNameFromCode(code, lang.name);
-							return {
-								code: code,
-								name: translatedName
-							};
-						});
+						console.error(`Error fetching DeepL languages via proxy ${endpoint}:`, error);
+						// Surface an empty list so the UI can continue to function gracefully
+						return of([] as SupportedLanguage[]);
 					})
 				);
 		});
@@ -282,9 +272,9 @@ export class TranslationApiService {
 		message: string
 	} {
 		if (apiType === 'deepl-free') {
-			// DeepL needs a countdown before updating usage
+			// Expected behavior: perform a single check immediately after translation (no countdown, no retries)
 			return {
-				needsCountdown: true,
+				needsCountdown: false,
 				message: 'USAGE_UPDATE_NOTICE'
 			};
 		} else if (apiType === 'google-free') {

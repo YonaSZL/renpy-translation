@@ -1,29 +1,30 @@
-@import '../../../../styles/variables';
+@use "sass:color";
+@use '../../../../styles/variables';
 
 .drag-drop-area {
-	border: $border-width-md dashed $text-color-light;
-	border-radius: $border-radius-lg;
-	padding: $large-padding;
+	border: variables.$border-width-md dashed variables.$text-color-light;
+	border-radius: variables.$border-radius-lg;
+	padding: variables.$large-padding;
 	text-align: center;
-	margin-bottom: $spacing-xxxl;
-	transition: all $transition-speed ease;
-	background-color: $text-color-lighter;
+	margin-bottom: variables.$spacing-xxxl;
+	transition: all variables.$transition-speed ease;
+	background-color: variables.$text-color-lighter;
 	cursor: pointer;
 
 	&.active {
-		border-color: $primary-color;
-		background-color: rgba($primary-color, 0.1);
+		border-color: variables.$primary-color;
+		background-color: rgba(variables.$primary-color, 0.1);
 	}
 
 	h3 {
-		margin: 0 0 $spacing-xl;
-		color: $text-color;
-		font-size: $heading-font-size-lg;
+		margin: 0 0 variables.$spacing-xl;
+		color: variables.$text-color;
+		font-size: variables.$heading-font-size-lg;
 	}
 
 	p {
-		margin: $spacing-xl 0;
-		color: $text-color-light;
+		margin: variables.$spacing-xl 0;
+		color: variables.$text-color-light;
 	}
 }
 
@@ -36,39 +37,39 @@
 
 .icon {
 	img {
-		margin-bottom: $spacing-xl;
-		opacity: $opacity-faded;
+		margin-bottom: variables.$spacing-xl;
+		opacity: variables.$opacity-faded;
 	}
 
 	.drag-drop-area.active & img {
-		opacity: $opacity-full;
+		opacity: variables.$opacity-full;
 	}
 }
 
 .browse-button {
-	@include button-base;
-	background-color: $primary-color;
-	color: $secondary-color;
-	padding: $spacing-xl $spacing-xxxl;
-	font-size: $base-font-size;
-	margin-top: $spacing-xl;
+	@include variables.button-base;
+	background-color: variables.$primary-color;
+	color: variables.$secondary-color;
+	padding: variables.$spacing-xl variables.$spacing-xxxl;
+	font-size: variables.$base-font-size;
+	margin-top: variables.$spacing-xl;
 
 	&:hover {
-		background-color: darken($primary-color, 10%);
+		background-color: color.adjust(variables.$primary-color, $lightness: -10%);
 	}
 }
 
 .file-type-info {
 	font-style: italic;
-	color: $text-color-light;
-	font-size: $base-font-size;
-	margin: $spacing-xs 0 $spacing-xl;
+	color: variables.$text-color-light;
+	font-size: variables.$base-font-size;
+	margin: variables.$spacing-xs 0 variables.$spacing-xl;
 }
 
 .error-message {
-	@include error-message;
+	@include variables.error-message;
 	width: 100%;
-	max-width: $error-message-max-width;
+	max-width: variables.$error-message-max-width;
 	text-align: center;
 	font-weight: bold;
 }

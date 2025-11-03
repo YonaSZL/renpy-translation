@@ -1,33 +1,33 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables';
 
 .form-group {
-	margin-bottom: $spacing-xl;
+	margin-bottom: variables.$spacing-xl;
 
 	label {
 		display: block;
-		margin-bottom: $spacing-xs;
+		margin-bottom: variables.$spacing-xs;
 		font-weight: bold;
-		color: $text-color-light;
+		color: variables.$text-color-light;
 	}
 
 	input {
 		width: 100%;
-		padding: $spacing-md $spacing-xl;
-		border: $border-width-md solid $text-color-light;
-		border-radius: $border-radius-md;
-		font-size: $base-font-size;
+		padding: variables.$spacing-md variables.$spacing-xl;
+		border: variables.$border-width-md solid variables.$text-color-light;
+		border-radius: variables.$border-radius-md;
+		font-size: variables.$base-font-size;
 
 		&:focus {
 			outline: none;
-			border-color: $primary-color;
-			box-shadow: 0 0 0 $spacing-xs rgba($primary-color, 0.25);
+			border-color: variables.$primary-color;
+			box-shadow: 0 0 0 variables.$spacing-xs rgba(variables.$primary-color, 0.25);
 		}
 	}
 }
 
 .input-container {
 	display: flex;
-	gap: $spacing-xl;
+	gap: variables.$spacing-xl;
 
 	input {
 		flex: 1;

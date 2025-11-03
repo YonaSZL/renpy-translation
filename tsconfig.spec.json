@@ -8,6 +8,9 @@
       "jasmine"
     ]
   },
+  "angularCompilerOptions": {
+    "enableTemplateControlFlow": true
+  },
   "include": [
     "src/**/*.spec.ts",
     "src/**/*.d.ts"

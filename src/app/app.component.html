@@ -1,16 +1,31 @@
 <app-language-selector (languageChanged)="onLanguageChanged($event)"></app-language-selector>
 
 <div class="container">
-	<app-file-upload (fileSelected)="handleFileSelected($event)"></app-file-upload>
+	<!-- Unified upload: single file or whole folder -->
+	<app-file-upload (fileSelected)="handleFileSelected($event)" (filesSelected)="handleFolderSelected($event)"></app-file-upload>
+
+	<!-- API selector is needed for both single-file and folder flows -->
 	<app-api-selector (apiSelected)="handleApiSelected($event)"></app-api-selector>
-	<app-file-translation
-		[apiKey]="apiKey"
-		[fileContent]="fileContent"
-		[fileName]="fileName"
-		[selectedApi]="selectedApi"
-		[targetLanguage]="targetLanguage">
-	</app-file-translation>
-	<app-file-viewer [fileContent]="fileContent" [fileName]="fileName"></app-file-viewer>
+
+	<!-- Conditional rendering: if a folder (multiple files) is selected, show the folder flow -->
+	@if (folderFiles.length > 1) {
+		<app-folder-translation
+			[files]="folderFiles"
+			[selectedApi]="selectedApi"
+			[apiKey]="apiKey"
+			[targetLanguage]="targetLanguage">
+		</app-folder-translation>
+	} @else {
+		<!-- Otherwise, show the single-file translation UI -->
+		<app-file-translation
+			[apiKey]="apiKey"
+			[fileContent]="fileContent"
+			[fileName]="fileName"
+			[selectedApi]="selectedApi"
+			[targetLanguage]="targetLanguage">
+		</app-file-translation>
+		<app-file-viewer [fileContent]="fileContent" [fileName]="fileName"></app-file-viewer>
+	}
 </div>
 
 <router-outlet/>

@@ -1,49 +1,49 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables';
 
 .file-content-container {
-	border: $border-width-md solid $text-color-light;
-	border-radius: $border-radius-lg;
+	border: variables.$border-width-md solid variables.$text-color-light;
+	border-radius: variables.$border-radius-lg;
 	overflow: hidden;
-	margin-top: $spacing-xxxl;
-	box-shadow: $box-shadow-sm;
+	margin-top: variables.$spacing-xxxl;
+	box-shadow: variables.$box-shadow-sm;
 }
 
 .file-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: $spacing-xl;
-	background-color: $text-color-lighter;
+	padding: variables.$spacing-xl;
+	background-color: variables.$text-color-lighter;
 	cursor: pointer;
 	width: 100%;
 	text-align: left;
 	border: none;
-	border-bottom: $border-width-md solid $text-color-light;
+	border-bottom: variables.$border-width-md solid variables.$text-color-light;
 	font: inherit;
 	outline: none;
 
 	h3 {
 		margin: 0;
-		font-size: $heading-font-size-lg;
-		color: $text-color;
+		font-size: variables.$heading-font-size-lg;
+		color: variables.$text-color;
 	}
 }
 
 .collapse-icon {
-	font-size: $heading-font-size-lg;
-	color: $text-color;
+	font-size: variables.$heading-font-size-lg;
+	color: variables.$text-color;
 }
 
 .file-content {
-	padding: $spacing-xl;
-	max-height: $file-content-max-height;
+	padding: variables.$spacing-xl;
+	max-height: variables.$file-content-max-height;
 	overflow-y: auto;
-	transition: max-height $transition-speed ease;
-	background-color: $text-color-lighter;
+	transition: max-height variables.$transition-speed ease;
+	background-color: variables.$text-color-lighter;
 
 	&.collapsed {
 		max-height: 0;
-		padding: 0 $spacing-xl;
+		padding: 0 variables.$spacing-xl;
 		overflow: hidden;
 	}
 }
@@ -52,7 +52,7 @@ pre {
 	margin: 0;
 	white-space: pre-wrap;
 	word-wrap: break-word;
-	font-size: $base-font-size;
-	line-height: $base-line-height;
-	color: $text-color;
+	font-size: variables.$base-font-size;
+	line-height: variables.$base-line-height;
+	color: variables.$text-color;
 }

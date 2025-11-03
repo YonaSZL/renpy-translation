@@ -19,7 +19,10 @@
 		<input #fileInput (change)="onFileSelected($event)" [attr.aria-label]="'ARIA_FILE_INPUT' | translate"
 			   accept=".rpy"
 			   class="hidden"
-			   type="file">
+			   type="file"
+			   webkitdirectory
+			   directory
+			   multiple>
 		<div *ngIf="showError" class="error-message" role="alert">
 			{{ errorMessage }}
 		</div>

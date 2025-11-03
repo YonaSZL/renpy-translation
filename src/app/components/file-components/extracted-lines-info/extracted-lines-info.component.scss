@@ -1,39 +1,39 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables';
 
 :host {
 	display: block;
 }
 
 .extracted-lines-info {
-	@include card;
+	@include variables.card;
 }
 
 .extracted-header {
 	font-weight: bold;
-	margin-bottom: $spacing-md;
-	color: $text-color;
+	margin-bottom: variables.$spacing-md;
+	color: variables.$text-color;
 }
 
 .extracted-details {
 	display: flex;
 	flex-direction: column;
-	gap: $spacing-md;
+	gap: variables.$spacing-md;
 }
 
 .limit-warning {
-	@include error-message;
-	color: $error-color;
-	background-color: rgba($error-color, 0.1);
-	border-color: $error-color;
-	margin-top: $spacing-md;
+	@include variables.error-message;
+	color: variables.$error-color;
+	background-color: rgba(variables.$error-color, 0.1);
+	border-color: variables.$error-color;
+	margin-top: variables.$spacing-md;
 	font-weight: bold;
 }
 
 .limit-details {
-	margin-top: $spacing-xs;
-	font-size: $base-font-size;
-	padding: $spacing-xs;
-	background-color: rgba($error-color, 0.2);
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $error-color;
+	margin-top: variables.$spacing-xs;
+	font-size: variables.$base-font-size;
+	padding: variables.$spacing-xs;
+	background-color: rgba(variables.$error-color, 0.2);
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$error-color;
 }

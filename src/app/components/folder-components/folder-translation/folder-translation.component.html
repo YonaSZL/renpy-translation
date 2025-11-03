@@ -1,0 +1,36 @@
+<div class="folder-translation" *ngIf="files?.length">
+  <div class="controls">
+    <button type="button" (click)="preScanFolder()" [disabled]="isScanning || isTranslating">
+      {{ 'SCAN_FOLDER' | translate }}
+    </button>
+    <button type="button" (click)="translateFolder()" [disabled]="!scanDone || isTranslating || isScanning">
+      {{ 'TRANSLATE_FOLDER' | translate }}
+    </button>
+  </div>
+
+  <div class="progress" *ngIf="isScanning || isTranslating">
+    <div class="bar" [style.width.%]="progress"></div>
+    <div class="label">{{ isScanning ? ('SCANNING' | translate) : ('TRANSLATING' | translate) }} {{progress}}%</div>
+  </div>
+
+  <div class="summary" *ngIf="scanDone">
+    <div>{{ 'FILES_FOUND' | translate }}: {{ fileMetas.length }}</div>
+  </div>
+
+  <table class="files" *ngIf="scanDone">
+    <thead>
+      <tr>
+        <th>{{ 'FILE' | translate }}</th>
+        <th>{{ 'CHARS' | translate }}</th>
+        <th>{{ 'STATUS' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of fileMetas | slice:0:200">
+        <td>{{ m.relativePath }}</td>
+        <td>{{ m.charCount }}</td>
+        <td>{{ m.status }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

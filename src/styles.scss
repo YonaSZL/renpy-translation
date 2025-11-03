@@ -1,4 +1,4 @@
-@import 'styles/variables';
+@use 'styles/variables';
 
 /* You can add global styles to this file, and also import other style files */
 * {
@@ -8,11 +8,11 @@
 }
 
 body {
-	font-family: $base-font-family;
-	line-height: $base-line-height;
-	color: $text-color;
-	background-color: $secondary-color;
-	padding: $spacing-xxxl;
+	font-family: variables.$base-font-family;
+	line-height: variables.$base-line-height;
+	color: variables.$text-color;
+	background-color: variables.$secondary-color;
+	padding: variables.$spacing-xxxl;
 }
 
 html, body {

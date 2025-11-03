@@ -1,93 +1,93 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables';
 
 :host {
 	display: block;
 }
 
 .api-usage-info {
-	@include card;
+	@include variables.card;
 }
 
 .loading-usage {
 	font-style: italic;
-	color: $text-color-light;
+	color: variables.$text-color-light;
 }
 
 .updating-usage {
 	font-weight: bold;
-	color: $primary-color;
-	background-color: rgba($primary-color, 0.1);
-	padding: $spacing-md;
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $primary-color;
+	color: variables.$primary-color;
+	background-color: rgba(variables.$primary-color, 0.1);
+	padding: variables.$spacing-md;
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$primary-color;
 }
 
 .countdown-bar {
-	height: $spacing-md;
-	background-color: $text-color-light;
-	border-radius: $border-radius-md;
+	height: variables.$spacing-md;
+	background-color: variables.$text-color-light;
+	border-radius: variables.$border-radius-md;
 	overflow: hidden;
-	margin-top: $spacing-md;
+	margin-top: variables.$spacing-md;
 }
 
 .countdown-progress {
 	height: 100%;
-	background-color: $primary-color;
-	transition: width $transition-speed;
+	background-color: variables.$primary-color;
+	transition: width variables.$transition-speed;
 }
 
 .usage-header {
 	font-weight: bold;
-	margin-bottom: $spacing-md;
-	color: $text-color;
+	margin-bottom: variables.$spacing-md;
+	color: variables.$text-color;
 }
 
 .usage-details {
 	display: flex;
 	flex-direction: column;
-	gap: $spacing-xxl;
+	gap: variables.$spacing-xxl;
 }
 
 .limit-section {
 	display: flex;
 	flex-direction: column;
-	gap: $spacing-xs;
-	padding: $spacing-md;
-	background-color: $secondary-color;
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $primary-color;
+	gap: variables.$spacing-xs;
+	padding: variables.$spacing-md;
+	background-color: variables.$secondary-color;
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$primary-color;
 }
 
 .limit-label {
 	font-weight: bold;
-	color: $text-color;
+	color: variables.$text-color;
 }
 
 .usage-bar {
-	height: $spacing-md;
-	background-color: $text-color-light;
-	border-radius: $border-radius-md;
+	height: variables.$spacing-md;
+	background-color: variables.$text-color-light;
+	border-radius: variables.$border-radius-md;
 	overflow: hidden;
 }
 
 .usage-progress {
 	height: 100%;
-	background-color: $primary-color;
-	transition: width $transition-speed;
+	background-color: variables.$primary-color;
+	transition: width variables.$transition-speed;
 }
 
 .usage-error {
-	color: $error-color;
+	color: variables.$error-color;
 	font-weight: bold;
 }
 
 .usage-note {
 	font-style: italic;
-	color: $text-color-light;
-	font-size: $base-font-size;
-	margin-top: $spacing-md;
-	padding: $spacing-md;
-	background-color: $secondary-color;
-	border-radius: $border-radius-md;
-	border-left: $border-width-xl solid $primary-color;
+	color: variables.$text-color-light;
+	font-size: variables.$base-font-size;
+	margin-top: variables.$spacing-md;
+	padding: variables.$spacing-md;
+	background-color: variables.$secondary-color;
+	border-radius: variables.$border-radius-md;
+	border-left: variables.$border-width-xl solid variables.$primary-color;
 }

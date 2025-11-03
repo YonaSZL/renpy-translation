@@ -19,6 +19,7 @@
     "module": "ES2022"
   },
   "angularCompilerOptions": {
+	"enableTemplateControlFlow": true,
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
