@@ -6,25 +6,8 @@ import {LanguageLocalizationService} from './language-localization.service';
 import {GoogleTranslateService} from './google-translate.service';
 import {DeepLTranslationService} from './deepl-translation.service';
 import {SupportedLanguage} from '../models/supported-language.model';
-
-export interface ApiUsageResult {
-	character_count: number;
-	character_limit: number;
-	weekly_limit?: number;
-	daily_limit?: number;
-	file_char_limit?: number;
-	error?: string;
-	retryCount?: number;
-	previousCharacterCount?: number;
-	shouldRetry?: boolean;
-	willExceedLimit?: boolean;
-	willExceedFileLimit?: boolean;
-}
-
-export interface TranslationResult {
-	translatedTexts: string[];
-	error?: string;
-}
+import {ApiUsageResult} from '../models/api-usage-result.model';
+import {TranslationResult} from '../models/translation-result.model';
 
 @Injectable({
 	providedIn: 'root'
@@ -123,7 +106,6 @@ export class TranslationApiService {
 			};
 		} else if (apiType === 'google-free') {
 			return this.googleTranslateService.checkWillExceedLimits(
-				currentCount,
 				additionalCount,
 				characterLimit
 			);

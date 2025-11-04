@@ -2,41 +2,23 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
+import {DeepLUsageResult} from '../models/deepl-usage-result.model';
+import {DeepLUsageResponse} from '../models/deepl-usage-response.model';
+import {DeepLResponse} from '../models/deepl-response.model';
+import {
+	DEEPL_API_URL,
+	DEEPL_FREE_CHAR_LIMIT,
+	DEEPL_HEADER_SIZE_LIMIT,
+	DEEPL_REQUEST_SIZE_LIMIT,
+	DEEPL_USAGE_URL
+} from '../constants/api.constants';
 
-interface DeepLResponse {
-	translations: {
-		detected_source_language: string;
-		text: string;
-	}[];
-}
-
-interface DeepLUsageResponse {
-	character_count: number;
-	character_limit: number;
-}
-
-export interface DeepLUsageResult {
-	character_count: number;
-	character_limit: number;
-	error?: string;
-	retryCount?: number;
-	previousCharacterCount?: number;
-	shouldRetry?: boolean;
-}
 
 @Injectable({
 	providedIn: 'root'
 })
 export class DeepLTranslationService {
-	// DeepL API limits
-	readonly DEEPL_FREE_CHAR_LIMIT = 500000; // 500,000 characters per month for DeepL API Free
-	readonly DEEPL_REQUEST_SIZE_LIMIT = 128 * 1024; // 128 KiB (128*1024 bytes)
-	readonly DEEPL_HEADER_SIZE_LIMIT = 16 * 1024; // 16 KiB (16*1024 bytes)
-	private readonly API_URL = '/deepl-api/v2/translate'; // Path to the proxy
-	private readonly USAGE_URL = '/deepl-api/v2/usage'; // Path to the usage endpoint
-
-	constructor(private readonly httpClient: HttpClient) {
-	}
+	constructor(private readonly httpClient: HttpClient) {}
 
 	/**
 	 * Translate multiple texts using DeepL API
@@ -60,7 +42,7 @@ export class DeepLTranslationService {
 			.set('target_lang', targetLang);
 
 		const baseParamsSize = baseParams.toString().length;
-		const availableSize = this.DEEPL_REQUEST_SIZE_LIMIT - this.DEEPL_HEADER_SIZE_LIMIT - baseParamsSize;
+		const availableSize = DEEPL_REQUEST_SIZE_LIMIT - DEEPL_HEADER_SIZE_LIMIT - baseParamsSize;
 
 		// Split texts into batches that fit within the request size limit
 		const batches: string[][] = [];
@@ -100,7 +82,7 @@ export class DeepLTranslationService {
 			let startIndex = 0;
 
 			// Process each batch
-			batches.forEach((batch) => {
+			for (const batch of batches) {
 				this.translateBatch(batch, apiKey, targetLang).subscribe({
 					next: (translations) => {
 						// Place translations in the correct positions in the result array
@@ -120,7 +102,7 @@ export class DeepLTranslationService {
 						observer.error(err);
 					}
 				});
-			});
+			}
 		});
 	}
 
@@ -134,7 +116,7 @@ export class DeepLTranslationService {
 			'Authorization': `DeepL-Auth-Key ${apiKey}`
 		});
 
-		return this.httpClient.get<DeepLUsageResponse>(this.USAGE_URL, {headers});
+		return this.httpClient.get<DeepLUsageResponse>(DEEPL_USAGE_URL, {headers});
 	}
 
 	/**
@@ -206,7 +188,7 @@ export class DeepLTranslationService {
 	 * @param characterLimit The character limit (defaults to DeepL Free limit)
 	 * @returns True if the count exceeds the limit, false otherwise
 	 */
-	exceedsCharacterLimit(characterCount: number, characterLimit: number = this.DEEPL_FREE_CHAR_LIMIT): boolean {
+	exceedsCharacterLimit(characterCount: number, characterLimit: number = DEEPL_FREE_CHAR_LIMIT): boolean {
 		return characterCount > characterLimit;
 	}
 
@@ -220,7 +202,7 @@ export class DeepLTranslationService {
 	checkWillExceedLimit(
 		currentCount: number,
 		additionalCount: number,
-		characterLimit: number = this.DEEPL_FREE_CHAR_LIMIT
+		characterLimit: number = DEEPL_FREE_CHAR_LIMIT
 	): { willExceedLimit: boolean } {
 		const projectedUsage = currentCount + additionalCount;
 		return {
@@ -251,7 +233,7 @@ export class DeepLTranslationService {
 		});
 
 		// Make a single request with all texts in this batch
-		return this.httpClient.post<DeepLResponse>(this.API_URL, params.toString(), {headers}).pipe(
+		return this.httpClient.post<DeepLResponse>(DEEPL_API_URL, params.toString(), {headers}).pipe(
 			map(response => {
 				if (response.translations?.length) {
 					// Extract all translated texts in order

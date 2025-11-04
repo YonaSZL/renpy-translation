@@ -1,22 +1,22 @@
 import {Component, Input, OnChanges, OnDestroy, signal, SimpleChanges} from '@angular/core';
-import {CommonModule, NgIf} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {ApiUsageResult, TranslationApiService} from '../../../services/translation-api.service';
+import {TranslationApiService} from '../../../services/translation-api.service';
 import {RenpyFileParserService} from '../../../services/renpy-file-parser.service';
 import {TranslationProcessorService} from '../../../services/translation-processor.service';
 import {catchError, map, Observable, of} from 'rxjs';
 import {ApiUsageInfoComponent} from '../../api-components/api-usage-info/api-usage-info.component';
 import {ExtractedLinesInfoComponent} from '../extracted-lines-info/extracted-lines-info.component';
+import {ApiUsageResult} from '../../../models/api-usage-result.model';
 
 @Component({
 	selector: 'app-file-translation',
 	standalone: true,
 	imports: [
 		CommonModule,
-		NgIf,
 		MatButtonModule,
 		MatIconModule,
 		TranslateModule,
@@ -273,14 +273,14 @@ export class FileTranslationComponent implements OnChanges, OnDestroy {
 
 	generateTranslationFile(content: string): void {
 		const blob = this.translationProcessorService.generateTranslationFile(content);
-		const url = window.URL.createObjectURL(blob);
+		const url = globalThis.URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
 		a.download = this.translationFileName();
 		document.body.appendChild(a);
 		a.click();
-		window.URL.revokeObjectURL(url);
-		document.body.removeChild(a);
+		globalThis.URL.revokeObjectURL(url);
+		a.remove();
 
 		this.snackBar.open(this.translateService.instant('FILE_GENERATED_SUCCESS'), this.translateService.instant('CLOSE'), {
 			duration: 3000,

@@ -53,7 +53,7 @@ export class FileUploadComponent {
 		this.isDragOver = false;
 	}
 
-	private readEntries(entries: any[]): Promise<File[]> {
+	private async readEntries(entries: any[]): Promise<File[]> {
 		const allFiles: File[] = [];
 		const promises: Promise<void>[] = [];
 
@@ -66,13 +66,20 @@ export class FileUploadComponent {
 							resolve();
 							return;
 						}
-						batch.forEach(entry => {
+						for (const entry of batch) {
 							if (entry.isFile) {
-								promises.push(new Promise(res => entry.file((file: File) => { allFiles.push(file); res(); })));
+								promises.push(
+									new Promise<void>((res) => {
+										entry.file((file: File) => {
+											allFiles.push(file);
+											res();
+										});
+									})
+								);
 							} else if (entry.isDirectory) {
 								promises.push(readDirectory(entry));
 							}
-						});
+						}
 						readBatch();
 					});
 				};
@@ -80,15 +87,23 @@ export class FileUploadComponent {
 			});
 		};
 
-		entries.forEach(e => {
+		for (const e of entries) {
 			if (e.isFile) {
-				promises.push(new Promise(res => e.file((file: File) => { allFiles.push(file); res(); })));
+				promises.push(
+					new Promise<void>((res) => {
+						e.file((file: File) => {
+							allFiles.push(file);
+							res();
+						});
+					})
+				);
 			} else if (e.isDirectory) {
 				promises.push(readDirectory(e));
 			}
-		});
+		}
 
-		return Promise.all(promises).then(() => allFiles);
+		await Promise.all(promises);
+		return allFiles;
 	}
 
 	onDrop(event: DragEvent): void {
@@ -98,11 +113,10 @@ export class FileUploadComponent {
 		this.showError = false;
 
 		const items = event.dataTransfer?.items;
-		if (items && items.length) {
+		if (items?.length) {
 			const entries: any[] = [];
-			for (let i = 0; i < items.length; i++) {
-				const item = items[i];
-				const entry = (item as any).webkitGetAsEntry?.();
+			for (const element of items) {
+				const entry = (element as any).webkitGetAsEntry?.();
 				if (entry) entries.push(entry);
 			}
 
@@ -114,7 +128,7 @@ export class FileUploadComponent {
 
 		// Fallback: accept dropped files list
 		const files = event.dataTransfer?.files;
-		if (files && files.length) {
+		if (files?.length) {
 			this.emitAccordingToCount(Array.from(files));
 		}
 	}

@@ -4,8 +4,6 @@ import {Injectable} from '@angular/core';
 	providedIn: 'root'
 })
 export class RenpyFileParserService {
-	constructor() {
-	}
 
 	/**
 	 * Extracts lines that need to be translated from the file content
@@ -52,7 +50,7 @@ export class RenpyFileParserService {
 		const cleanedLine = line.trim().replace(/^#\s*/, '');  // Remove # if present at the beginning of the line
 
 		// Use RegExp to capture the command before the quotes
-		const match = RegExp(/^([^"]+)\s*"/).exec(cleanedLine);
+		const match = new RegExp(/^([^"]+)\s*"/).exec(cleanedLine);
 
 		if (match) {
 			// match[1]: it's the command we want to extract
@@ -142,7 +140,19 @@ export class RenpyFileParserService {
 			const firstLineAfterComments = lines[i + 5].trim();
 
 			// If the first line after the comments doesn't contain quotes, it's a command like "nvl clear"
-			if (!firstLineAfterComments.includes('"')) {
+			if (firstLineAfterComments.includes('"')) {
+				// Standard case: a single line to fill after the comments
+				// Check if the line contains empty quotes (to fill)
+				if (firstLineAfterComments.includes('""')) {
+					// The second commented line contains the text to translate
+					this.extractAndAddTextToTranslate(lines[i + 4], linesToTranslate);
+				}
+				// Skip if the line already has content between quotes (not empty quotes)
+				else if (firstLineAfterComments.includes('"') && !firstLineAfterComments.includes('""')) {
+					// Line already has translation, skip it
+				}
+				return i + 6; // Move beyond the block (2 commented lines + 1 line to fill)
+			} else {
 				// Check if there's a second line to fill
 				if (i + 6 < lines.length) {
 					const secondLineAfterComments = lines[i + 6].trim();
@@ -157,18 +167,6 @@ export class RenpyFileParserService {
 					}
 				}
 				return i + 7; // Move beyond the block (2 commented lines + 2 lines to fill)
-			} else {
-				// Standard case: a single line to fill after the comments
-				// Check if the line contains empty quotes (to fill)
-				if (firstLineAfterComments.includes('""')) {
-					// The second commented line contains the text to translate
-					this.extractAndAddTextToTranslate(lines[i + 4], linesToTranslate);
-				}
-				// Skip if the line already has content between quotes (not empty quotes)
-				else if (firstLineAfterComments.includes('"') && !firstLineAfterComments.includes('""')) {
-					// Line already has translation, skip it
-				}
-				return i + 6; // Move beyond the block (2 commented lines + 1 line to fill)
 			}
 		} else {
 			return i + 6; // Move beyond the block if no line to fill
@@ -241,7 +239,7 @@ export class RenpyFileParserService {
 			const nextLine = lines[nextIndex].trim();
 			// Check if it's an empty "new" line
 			if (nextLine.startsWith('new "') && (nextLine === 'new ""' || nextLine.endsWith('""'))) {
-				const oldMatch = RegExp(/old\s+"([^"]+)"/).exec(lines[i].trim());
+				const oldMatch = /old\s+"([^"]+)"/.exec(lines[i].trim());
 				const textToTranslate = oldMatch?.[1] ?? '';
 				if (textToTranslate) {
 					linesToTranslate.push(textToTranslate);
@@ -260,7 +258,7 @@ export class RenpyFileParserService {
 	 * @param linesToTranslate Array to store extracted text
 	 */
 	private extractAndAddTextToTranslate(line: string, linesToTranslate: string[]): void {
-		const textToTranslate = RegExp(/"(.*)"/).exec(line)?.[1] ?? '';
+		const textToTranslate = /"(.*)"/.exec(line)?.[1] ?? '';
 		if (textToTranslate) {
 			linesToTranslate.push(textToTranslate);
 		}
@@ -304,10 +302,10 @@ export class RenpyFileParserService {
 			const firstLineAfterComments = lines[i + 5].trim();
 
 			// If the first line after the comments doesn't contain quotes, it's a command like "nvl clear"
-			if (!firstLineAfterComments.includes('"')) {
-				return this.handleCommandWithoutQuotes(lines, i, linesToFill);
-			} else {
+			if (firstLineAfterComments.includes('"')) {
 				return this.handleStandardCase(lines, i, linesToFill, firstLineAfterComments);
+			} else {
+				return this.handleCommandWithoutQuotes(lines, i, linesToFill);
 			}
 		} else {
 			return i + 6; // Move beyond the block if no line to fill
@@ -422,7 +420,7 @@ export class RenpyFileParserService {
 	 */
 	private processOldNewPairForFill(lines: string[], i: number, linesToFill: string[]): number {
 		// Extract the "old" text for reference
-		RegExp(/old\s+"([^"]+)"/).exec(lines[i].trim());
+		new RegExp(/old\s+"([^"]+)"/).exec(lines[i].trim());
 		// Move to the next line which should be "new"
 		i++;
 		if (i < lines.length) {

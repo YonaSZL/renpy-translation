@@ -7,7 +7,7 @@ import {catchError, finalize} from 'rxjs/operators';
 import {of, Subscription} from 'rxjs';
 import {LanguageLocalizationService} from '../../../services/language-localization.service';
 import {SupportedLanguage} from '../../../models/supported-language.model';
-import {ApiDetails} from '../../../models/api-details';
+import {ApiDetails} from '../../../models/api-details.model';
 import {ApiSelectionComponent} from '../api-selection/api-selection.component';
 import {ApiKeyInputComponent} from '../api-key-input/api-key-input.component';
 import {LanguageSelectionComponent} from '../../language-components/language-selection/language-selection.component';
@@ -227,11 +227,11 @@ export class ApiSelectorComponent implements OnInit, OnDestroy {
 	}
 
 	private addLanguagesToAvailable(languages: SupportedLanguage[]): void {
-		languages.forEach(lang => {
+		for (const lang of languages) {
 			if (lang.code !== 'default' && !this.availableLanguages.some(l => l.code === lang.code)) {
 				this.availableLanguages.push(lang);
 			}
-		});
+		}
 	}
 
 	private updateDefaultOption(): void {

@@ -3,54 +3,24 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {forkJoin, Observable, of, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {SupportedLanguage} from '../models/supported-language.model';
-
-interface TranslationBatch {
-	timestamp: number;
-	character_count: number;
-}
-
-interface GoogleTranslateUsage {
-	character_count: number;
-	character_limit: number;
-	weekly_limit?: number;
-	daily_limit?: number;
-	file_char_limit?: number;
-	translation_batches?: TranslationBatch[];
-	daily_count?: number;
-	weekly_count?: number;
-}
-
-export interface GoogleTranslateUsageResult {
-	character_count: number;
-	character_limit: number;
-	weekly_limit?: number;
-	daily_limit?: number;
-	file_char_limit?: number;
-	daily_count?: number;
-	weekly_count?: number;
-	monthly_count?: number;
-	translation_batches?: TranslationBatch[];
-	error?: string;
-}
+import {GoogleTranslateUsage} from '../models/google-translate-usage.model';
+import {GoogleTranslateUsageResult} from '../models/google-translate-usage-result.model';
+import {
+	GOOGLE_TRANSLATE_API_URL,
+	GOOGLE_TRANSLATE_CHAR_LIMIT,
+	GOOGLE_TRANSLATE_DAILY_LIMIT, GOOGLE_TRANSLATE_FILE_CHAR_LIMIT, GOOGLE_TRANSLATE_LOCAL_STORAGE_KEY,
+	GOOGLE_TRANSLATE_USAGE_URL,
+	GOOGLE_TRANSLATE_WEEKLY_LIMIT
+} from '../constants/api.constants';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class GoogleTranslateService {
-	// Google Translate API limits (manually set)
-	readonly GOOGLE_TRANSLATE_CHAR_LIMIT = 500000; // 500,000 characters per month
-	readonly GOOGLE_TRANSLATE_WEEKLY_LIMIT = Math.floor(500000 / 4.3); // Weekly limit (monthly / 4.3)
-	readonly GOOGLE_TRANSLATE_DAILY_LIMIT = Math.floor((500000 / 4.3) / 7); // Daily limit (weekly / 7)
-	readonly GOOGLE_TRANSLATE_FILE_CHAR_LIMIT = 5000; // 5,000 characters per file
-	// Using the undocumented Google Translate API directly
-	private readonly API_URL = 'https://translate.googleapis.com/translate_a/single';
-	private readonly LANGUAGES_URL = 'https://translate.googleapis.com/translate_a/l';
-	private readonly LOCAL_STORAGE_KEY = 'google_translate_usage';
-
 	constructor(private readonly httpClient: HttpClient) {
 		// Initialize usage data if it doesn't exist or reset it if limits have changed
 		const usage = this.getUsageFromLocalStorage();
-		if (!usage || usage.character_limit !== this.GOOGLE_TRANSLATE_CHAR_LIMIT) {
+		if (usage?.character_limit !== GOOGLE_TRANSLATE_CHAR_LIMIT) {
 			this.resetUsageInLocalStorage();
 		}
 	}
@@ -67,10 +37,10 @@ export class GoogleTranslateService {
 		// Save with updated limits
 		this.saveUsageToLocalStorage({
 			character_count: 0, // Will be recalculated based on batches
-			character_limit: this.GOOGLE_TRANSLATE_CHAR_LIMIT,
-			weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
-			daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
-			file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+			character_limit: GOOGLE_TRANSLATE_CHAR_LIMIT,
+			weekly_limit: GOOGLE_TRANSLATE_WEEKLY_LIMIT,
+			daily_limit: GOOGLE_TRANSLATE_DAILY_LIMIT,
+			file_char_limit: GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
 			translation_batches: translationBatches
 		});
 	}
@@ -92,7 +62,7 @@ export class GoogleTranslateService {
 			.set('q', text);
 
 		// Make the request to the API
-		return this.httpClient.get<any>(`${this.API_URL}?${params.toString()}`)
+		return this.httpClient.get<any>(`${GOOGLE_TRANSLATE_API_URL}?${params.toString()}`)
 			.pipe(
 				map(response => {
 					// The response format is a nested array: [[["translated text","original text",null,null,1]]]
@@ -154,23 +124,21 @@ export class GoogleTranslateService {
 
 	/**
 	 * Check if adding new characters will exceed any API limits
-	 * @param currentCount Current character count (not used, kept for backward compatibility)
 	 * @param additionalCount Additional character count to add
 	 * @param characterLimit The character limit (defaults to Google Translate limit)
 	 * @returns Object with willExceedLimit and willExceedFileLimit flags
 	 */
 	checkWillExceedLimits(
-		currentCount: number,
 		additionalCount: number,
-		characterLimit: number = this.GOOGLE_TRANSLATE_CHAR_LIMIT
+		characterLimit: number = GOOGLE_TRANSLATE_CHAR_LIMIT
 	): { willExceedLimit: boolean, willExceedFileLimit: boolean } {
 		// Get current usage from local storage
 		const usage = this.getUsageFromLocalStorage() || {
 			character_count: 0,
 			character_limit: characterLimit,
-			weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
-			daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
-			file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+			weekly_limit: GOOGLE_TRANSLATE_WEEKLY_LIMIT,
+			daily_limit: GOOGLE_TRANSLATE_DAILY_LIMIT,
+			file_char_limit: GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
 			translation_batches: []
 		};
 
@@ -209,17 +177,17 @@ export class GoogleTranslateService {
 		const exceedsMonthly = projectedMonthlyCount > characterLimit;
 
 		// Check weekly limit
-		const weeklyLimit = usage.weekly_limit ?? this.GOOGLE_TRANSLATE_WEEKLY_LIMIT;
+		const weeklyLimit = usage.weekly_limit ?? GOOGLE_TRANSLATE_WEEKLY_LIMIT;
 		const projectedWeeklyCount = weeklyCount + additionalCount;
 		const exceedsWeekly = projectedWeeklyCount > weeklyLimit;
 
 		// Check daily limit
-		const dailyLimit = usage.daily_limit ?? this.GOOGLE_TRANSLATE_DAILY_LIMIT;
+		const dailyLimit = usage.daily_limit ?? GOOGLE_TRANSLATE_DAILY_LIMIT;
 		const projectedDailyCount = dailyCount + additionalCount;
 		const exceedsDaily = projectedDailyCount > dailyLimit;
 
 		// Check file character limit
-		const fileCharLimit = usage.file_char_limit ?? this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT;
+		const fileCharLimit = usage.file_char_limit ?? GOOGLE_TRANSLATE_FILE_CHAR_LIMIT;
 		const exceedsFileLimit = additionalCount > fileCharLimit;
 
 		return {
@@ -238,9 +206,7 @@ export class GoogleTranslateService {
 		const now = Date.now();
 
 		// Initialize translation_batches if it doesn't exist
-		if (!usage.translation_batches) {
-			usage.translation_batches = [];
-		}
+		usage.translation_batches ??= [];
 
 		// Define time windows
 		const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -290,7 +256,7 @@ export class GoogleTranslateService {
 	 * @returns GoogleTranslateUsage object or null if not found
 	 */
 	getUsageFromLocalStorage(): GoogleTranslateUsage | null {
-		const usageData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+		const usageData = localStorage.getItem(GOOGLE_TRANSLATE_LOCAL_STORAGE_KEY);
 		if (!usageData) {
 			return null;
 		}
@@ -304,7 +270,7 @@ export class GoogleTranslateService {
 	 * @param usage GoogleTranslateUsage object
 	 */
 	saveUsageToLocalStorage(usage: GoogleTranslateUsage): void {
-		localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(usage));
+		localStorage.setItem(GOOGLE_TRANSLATE_LOCAL_STORAGE_KEY, JSON.stringify(usage));
 	}
 
 	/**
@@ -315,9 +281,7 @@ export class GoogleTranslateService {
 		const currentUsage = this.getUsageFromLocalStorage();
 		if (currentUsage) {
 			// Initialize translation_batches if it doesn't exist
-			if (!currentUsage.translation_batches) {
-				currentUsage.translation_batches = [];
-			}
+			currentUsage.translation_batches ??= [];
 
 			// Add a new batch with the current timestamp
 			currentUsage.translation_batches.push({
@@ -341,9 +305,9 @@ export class GoogleTranslateService {
 		const usage = this.getUsageFromLocalStorage();
 		if (usage) {
 			// Ensure all limits are set
-			usage.weekly_limit ??= this.GOOGLE_TRANSLATE_WEEKLY_LIMIT;
-			usage.daily_limit ??= this.GOOGLE_TRANSLATE_DAILY_LIMIT;
-			usage.file_char_limit ??= this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT;
+			usage.weekly_limit ??= GOOGLE_TRANSLATE_WEEKLY_LIMIT;
+			usage.daily_limit ??= GOOGLE_TRANSLATE_DAILY_LIMIT;
+			usage.file_char_limit ??= GOOGLE_TRANSLATE_FILE_CHAR_LIMIT;
 
 			// Calculate daily and weekly counts
 			const now = Date.now();
@@ -375,10 +339,10 @@ export class GoogleTranslateService {
 		} else {
 			return of({
 				character_count: 0,
-				character_limit: this.GOOGLE_TRANSLATE_CHAR_LIMIT,
-				weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
-				daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
-				file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+				character_limit: GOOGLE_TRANSLATE_CHAR_LIMIT,
+				weekly_limit: GOOGLE_TRANSLATE_WEEKLY_LIMIT,
+				daily_limit: GOOGLE_TRANSLATE_DAILY_LIMIT,
+				file_char_limit: GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
 				translation_batches: []
 			});
 		}
@@ -409,10 +373,10 @@ export class GoogleTranslateService {
 				console.error('Error fetching Google Translate usage:', error);
 				return of({
 					character_count: 0,
-					character_limit: this.GOOGLE_TRANSLATE_CHAR_LIMIT,
-					weekly_limit: this.GOOGLE_TRANSLATE_WEEKLY_LIMIT,
-					daily_limit: this.GOOGLE_TRANSLATE_DAILY_LIMIT,
-					file_char_limit: this.GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
+					character_limit: GOOGLE_TRANSLATE_CHAR_LIMIT,
+					weekly_limit: GOOGLE_TRANSLATE_WEEKLY_LIMIT,
+					daily_limit: GOOGLE_TRANSLATE_DAILY_LIMIT,
+					file_char_limit: GOOGLE_TRANSLATE_FILE_CHAR_LIMIT,
 					daily_count: 0,
 					weekly_count: 0,
 					monthly_count: 0,
@@ -432,7 +396,7 @@ export class GoogleTranslateService {
 		const params = new HttpParams().set('client', 'gtx');
 
 		// Make the request to the API
-		return this.httpClient.get<any>(`${this.LANGUAGES_URL}?${params.toString()}`)
+		return this.httpClient.get<any>(`${GOOGLE_TRANSLATE_USAGE_URL}?${params.toString()}`)
 			.pipe(
 				map(response => {
 					// The response contains 'sl' (source languages) and 'tl' (target languages)

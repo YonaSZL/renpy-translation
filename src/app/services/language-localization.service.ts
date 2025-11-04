@@ -6,9 +6,7 @@ import {LANGUAGE_MAP} from '../constants/language.constants';
 	providedIn: 'root'
 })
 export class LanguageLocalizationService {
-
-	constructor(private readonly translateService: TranslateService) {
-	}
+	constructor(private readonly translateService: TranslateService) {}
 
 	/**
 	 * Get the translation key for a language code
@@ -27,7 +25,7 @@ export class LanguageLocalizationService {
 	getLanguageName(code: string): string {
 		const translationKey = this.getLanguageNameKey(code);
 		const translatedName = this.translateService.instant(translationKey);
-		return translatedName !== translationKey ? translatedName : code.toUpperCase();
+		return translatedName === translationKey ? code.toUpperCase() : translatedName;
 	}
 
 	/**

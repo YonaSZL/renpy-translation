@@ -11,7 +11,7 @@ import {FileTranslationComponent} from './components/file-components/file-transl
 import {FolderTranslationComponent} from './components/folder-components/folder-translation/folder-translation.component';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {Title} from '@angular/platform-browser';
-import {ApiDetails} from './models/api-details';
+import {ApiDetails} from './models/api-details.model';
 
 @Component({
 	selector: 'app-root',
@@ -53,27 +53,20 @@ constructor(
 		});
 	}
 
- handleFileSelected(file: File): void {
+	async handleFileSelected(file: File): Promise<void> {
 		// Clear any previously selected folder context
 		this.folderFiles = [];
 
 		this.fileName = file.name;
-		const reader = new FileReader();
 
-		reader.onload = (e: ProgressEvent<FileReader>) => {
-			if (e.target && typeof e.target.result === 'string') {
-				this.fileContent = e.target.result;
-			}
-		};
-
-		reader.onerror = () => {
-			console.error('Error reading file');
+		try {
+			this.fileContent = await file.text();
+		} catch (error) {
+			console.error('Error reading file', error);
 			this.translateService.get('ERROR_READING_FILE').subscribe((errorMsg: string) => {
 				this.fileContent = errorMsg;
 			});
-		};
-
-		reader.readAsText(file);
+		}
 	}
 
 	handleApiSelected(apiSettings: ApiDetails): void {
@@ -94,7 +87,7 @@ async handleFolderSelected(files: File[]): Promise<void> {
 		}
 		if (files.length === 1) {
 			// Delegate to single-file handler for backward compatibility
-			this.handleFileSelected(files[0]);
+			await this.handleFileSelected(files[0]);
 			return;
 		}
 

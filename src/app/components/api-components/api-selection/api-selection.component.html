@@ -5,6 +5,10 @@
 		[(ngModel)]="selectedApi"
 		[attr.aria-label]="'SELECT_API' | translate"
 		id="api-select">
-		<option *ngFor="let api of apis" [value]="api.api">{{ api.name }}</option>
+
+		@for (api of apis; track $index) {
+			<option [value]="api.api">{{ api.name }}</option>
+		}
+
 	</select>
 </div>

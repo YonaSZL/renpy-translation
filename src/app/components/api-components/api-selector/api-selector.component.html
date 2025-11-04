@@ -7,11 +7,12 @@
 		[selectedApi]="selectedApi">
 	</app-api-selection>
 
-	<app-api-key-input
-		(apiKeyChange)="onApiKeyChange($event)"
-		*ngIf="selectedApi !== 'google-free'"
-		[apiKey]="apiKey">
-	</app-api-key-input>
+	@if (selectedApi !== 'google-free') {
+		<app-api-key-input
+			(apiKeyChange)="onApiKeyChange($event)"
+			[apiKey]="apiKey">
+		</app-api-key-input>
+	}
 
 	<app-language-selection
 		(languageChange)="onSubmit($event)"

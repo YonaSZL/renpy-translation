@@ -4,8 +4,6 @@ import {Injectable} from '@angular/core';
 	providedIn: 'root'
 })
 export class TranslationProcessorService {
-	constructor() {
-	}
 
 	/**
 	 * Create filled lines with translations
@@ -29,7 +27,7 @@ export class TranslationProcessorService {
 			const translatedText = translatedLines[i];
 
 			// Extract the command from the line to fill
-			const commandMatch = RegExp(/^([^"]+)/).exec(lineToFill);
+			const commandMatch = /^([^"]+)/.exec(lineToFill);
 			const command = commandMatch ? commandMatch[1].trim() : '';
 
 			// Create the new line with the translation
@@ -150,9 +148,12 @@ export class TranslationProcessorService {
 		extractCommand: (line: string) => string
 	): number {
 		// Add the header lines of the block
-		outputLines.push(lines[i]);     // # game/...
-		outputLines.push(lines[i + 1]); // translate french...
-		outputLines.push(lines[i + 2] || ''); // empty line
+		outputLines.push(
+			lines[i],        // # game/...
+			lines[i + 1],    // translate french...
+			lines[i + 2] || '' // empty line
+		);
+
 
 		const comment1 = lines[i + 3]?.trim();
 		const comment2 = lines[i + 4]?.trim();
@@ -190,8 +191,10 @@ export class TranslationProcessorService {
 		extractCommand: (line: string) => string
 	): number {
 		// Add the commented lines as they are
-		outputLines.push(lines[i + 3]); // First commented line
-		outputLines.push(lines[i + 4]); // Second commented line (contains the text to translate)
+		outputLines.push(
+			lines[i + 3], // First commented line
+			lines[i + 4]  // Second commented line (contains the text to translate)
+		);
 
 		// Check if there's a line to fill after the comments
 		if (i + 5 < lines.length) {
@@ -199,10 +202,10 @@ export class TranslationProcessorService {
 			const firstLineAfterComments = lines[i + 5].trim();
 
 			// If the first line after the comments doesn't contain quotes, it's a command like "nvl clear"
-			if (!firstLineAfterComments.includes('"')) {
-				return this.handleCommandWithoutQuotesForReplace(lines, i, outputLines, availableFilledLines, extractCommand);
-			} else {
+			if (firstLineAfterComments.includes('"')) {
 				return this.handleStandardCaseForReplace(lines, i, outputLines, availableFilledLines, firstLineAfterComments, i + 5, extractCommand);
+			} else {
+				return this.handleCommandWithoutQuotesForReplace(lines, i, outputLines, availableFilledLines, extractCommand);
 			}
 		} else {
 			// If no line to fill, add an empty line
@@ -338,16 +341,16 @@ export class TranslationProcessorService {
 		// Look for a filled line with the same command
 		const matchingIndex = this.findFilledLineIndex(availableFilledLines, commandToFill, 0);
 
-		if (matchingIndex !== -1) {
+		if (matchingIndex === -1) {
+			// If no corresponding filled line, keep the original line
+			outputLines.push(lines[lineIndex]);
+		} else {
 			// Use the found filled line
 			const filledLine = availableFilledLines[matchingIndex]!;
 			outputLines.push(`    ${filledLine}`);
 
 			// Mark the line as used by replacing it with null
 			availableFilledLines[matchingIndex] = null;
-		} else {
-			// If no corresponding filled line, keep the original line
-			outputLines.push(lines[lineIndex]);
 		}
 	}
 
@@ -408,16 +411,16 @@ export class TranslationProcessorService {
 		// Look for a filled line with the same command
 		const matchingIndex = this.findFilledLineIndex(availableFilledLines, commandToFill, 0);
 
-		if (matchingIndex !== -1) {
+		if (matchingIndex === -1) {
+			// If no corresponding filled line, keep the original line
+			outputLines.push(lines[lineIndex]);
+		} else {
 			// Use the found filled line
 			const filledLine = availableFilledLines[matchingIndex]!;
 			outputLines.push(`    ${filledLine}`);
 
 			// Mark the line as used by replacing it with null
 			availableFilledLines[matchingIndex] = null;
-		} else {
-			// If no corresponding filled line, keep the original line
-			outputLines.push(lines[lineIndex]);
 		}
 	}
 }

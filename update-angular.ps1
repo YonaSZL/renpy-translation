@@ -10,6 +10,15 @@ $TARGET_NGX_TRANSLATE_CORE = "16.0.4"
 $TARGET_NGX_TRANSLATE_HTTP = "16.0.1"
 $TARGET_CDK = "20.2.x"
 $TARGET_BUILD_ANGULAR = "20.2.0"
+$TARGET_FILE_SAVER = "2.0.5"
+$TARGET_JSZIP = "3.10.1"
+$TARGET_ZONE = "0.15.1"
+$TARGET_TYPES_FILE_SAVER = "2.0.7"
+$TARGET_JASMINE = "5.6.0"
+$TARGET_KARMA = "6.4.0"
+$TARGET_KARMA_CHROME = "3.2.0"
+$TARGET_KARMA_JASMINE = "5.1.0"
+$TARGET_KARMA_HTML = "2.1.0"
 
 # Backup function
 function Backup-Project {
@@ -58,7 +67,9 @@ try {
     Write-Host "`nRemoving old Angular packages..."
     npm uninstall @angular/cli @angular/core @angular/common @angular/compiler @angular/compiler-cli `
     @angular/forms @angular/platform-browser @angular/platform-browser-dynamic @angular/router @angular/material `
-    @angular/cdk @angular-devkit/build-angular --save --save-dev -f -E | Out-Null
+    @angular/cdk @angular-devkit/build-angular file-saver jszip zone.js `
+    @ngx-translate/core @ngx-translate/http-loader @types/file-saver @types/jasmine jasmine-core karma `
+    karma-chrome-launcher karma-coverage karma-jasmine karma-jasmine-html-reporter rxjs typescript --save --save-dev -f -E | Out-Null
 
     # Clean node_modules and lock file
     Write-Host "`nCleaning node_modules and package-lock.json..."
@@ -73,6 +84,10 @@ try {
     @angular/material@$TARGET_ANGULAR @angular/cdk@$TARGET_CDK @angular-devkit/build-angular@$TARGET_BUILD_ANGULAR `
     typescript@$TARGET_TYPESCRIPT rxjs@$TARGET_RxJS `
     @ngx-translate/core@$TARGET_NGX_TRANSLATE_CORE @ngx-translate/http-loader@$TARGET_NGX_TRANSLATE_HTTP `
+    file-saver@$TARGET_FILE_SAVER jszip@$TARGET_JSZIP zone.js@$TARGET_ZONE `
+    @types/file-saver@$TARGET_TYPES_FILE_SAVER @types/jasmine@$TARGET_JASMINE jasmine-core@$TARGET_JASMINE `
+    karma@$TARGET_KARMA karma-chrome-launcher@$TARGET_KARMA_CHROME karma-jasmine@$TARGET_KARMA_JASMINE `
+    karma-jasmine-html-reporter@$TARGET_KARMA_HTML `
     --save --save-dev --force --legacy-peer-deps
 
     # 5. Run Angular migrations (including optional)

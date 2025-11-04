@@ -1,5 +1,13 @@
 <div class="language-selector">
-	<select (change)="changeLanguage($event)" [attr.aria-label]="'LANGUAGE' | translate" [value]="currentLang">
-		<option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</option>
+	<select
+		(change)="changeLanguage($event)"
+		[attr.aria-label]="'LANGUAGE' | translate"
+		[value]="currentLang"
+	>
+		@for (language of languages; track language.code) {
+			<option [value]="language.code">{{ language.name }}</option>
+		} @empty {
+			<option disabled>No languages available</option>
+		}
 	</select>
 </div>

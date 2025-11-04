@@ -1,37 +1,42 @@
-<div *ngIf="isApiConfigured() && fileContent" class="file-translation-container">
-	<!-- API Usage Information -->
-	<app-api-usage-info
-		[MAX_RETRY_ATTEMPTS]="MAX_RETRY_ATTEMPTS"
-		[characterCount]="characterCount()"
-		[characterLimit]="characterLimit()"
-		[countdownProgress]="countdownProgress()"
-		[countdownValue]="countdownValue()"
-		[dailyLimit]="dailyLimit()"
-		[fileCharLimit]="fileCharLimit()"
-		[isLoadingUsage]="isLoadingUsage()"
-		[isUpdatingUsage]="isUpdatingUsage()"
-		[retryCount]="retryCount()"
-		[selectedApi]="selectedApi"
-		[usageError]="usageError()"
-		[weeklyLimit]="weeklyLimit()">
-	</app-api-usage-info>
+@if (isApiConfigured() && fileContent) {
+	<div class="file-translation-container">
 
-	<!-- Extracted Lines Information -->
-	<app-extracted-lines-info
-		*ngIf="extractedLinesCount() > 0"
-		[extractedLinesCharCount]="extractedLinesCharCount()"
-		[extractedLinesCount]="extractedLinesCount()"
-		[fileCharLimit]="fileCharLimit()"
-		[selectedApi]="selectedApi"
-		[willExceedFileLimit]="willExceedFileLimit()"
-		[willExceedLimit]="willExceedLimit()">
-	</app-extracted-lines-info>
+		<!-- API Usage Information -->
+		<app-api-usage-info
+			[MAX_RETRY_ATTEMPTS]="MAX_RETRY_ATTEMPTS"
+			[characterCount]="characterCount()"
+			[characterLimit]="characterLimit()"
+			[countdownProgress]="countdownProgress()"
+			[countdownValue]="countdownValue()"
+			[dailyLimit]="dailyLimit()"
+			[fileCharLimit]="fileCharLimit()"
+			[isLoadingUsage]="isLoadingUsage()"
+			[isUpdatingUsage]="isUpdatingUsage()"
+			[retryCount]="retryCount()"
+			[selectedApi]="selectedApi"
+			[usageError]="usageError()"
+			[weeklyLimit]="weeklyLimit()">
+		</app-api-usage-info>
 
-	<button
-		(click)="translateFile()"
-		[disabled]="isLoadingUsage() || isTranslating() || willExceedLimit() || willExceedFileLimit()"
-		class="translate-button"
-		type="button">
-		{{ 'TRANSLATE_FILE' | translate }}
-	</button>
-</div>
+		<!-- Extracted Lines Information -->
+		@if (extractedLinesCount() > 0) {
+			<app-extracted-lines-info
+				[extractedLinesCharCount]="extractedLinesCharCount()"
+				[extractedLinesCount]="extractedLinesCount()"
+				[fileCharLimit]="fileCharLimit()"
+				[selectedApi]="selectedApi"
+				[willExceedFileLimit]="willExceedFileLimit()"
+				[willExceedLimit]="willExceedLimit()">
+			</app-extracted-lines-info>
+		}
+
+		<button
+			(click)="translateFile()"
+			[disabled]="isLoadingUsage() || isTranslating() || willExceedLimit() || willExceedFileLimit()"
+			class="translate-button"
+			type="button">
+			{{ 'TRANSLATE_FILE' | translate }}
+		</button>
+
+	</div>
+}

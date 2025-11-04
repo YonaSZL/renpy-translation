@@ -1,83 +1,102 @@
 <div class="api-usage-info">
-	<div *ngIf="isLoadingUsage" class="loading-usage">
-		{{ 'LOADING_USAGE' | translate }}...
-	</div>
+
+	@if (isLoadingUsage) {
+		<div class="loading-usage">
+			{{ 'LOADING_USAGE' | translate }}...
+		</div>
+	}
 
 	<!-- DeepL API Usage Information -->
-	<ng-container *ngIf="selectedApi === 'deepl-free'">
-		<div *ngIf="isUpdatingUsage" class="updating-usage">
-			<ng-container *ngIf="countdownValue > 0">
-				{{ 'USAGE_UPDATE_NOTICE' | translate }}: {{ countdownValue }}s
-				<div class="countdown-bar">
-					<div [style.width.%]="countdownProgress" class="countdown-progress"></div>
-				</div>
-			</ng-container>
-			<ng-container *ngIf="countdownValue === 0 && retryCount > 0">
-				{{ 'CHECKING_USAGE_UPDATE' | translate }}: {{ retryCount }}/{{ MAX_RETRY_ATTEMPTS }}
-				<div class="countdown-bar">
-					<div [style.width.%]="(retryCount / MAX_RETRY_ATTEMPTS) * 100"
-						 class="countdown-progress"></div>
-				</div>
-			</ng-container>
-		</div>
+	@if (selectedApi === 'deepl-free') {
 
-		<div *ngIf="!isLoadingUsage && !isUpdatingUsage && !usageError" class="usage-stats">
-			<div class="usage-header">{{ 'DEEPL_API_USAGE' | translate }}</div>
-			<div class="usage-details">
-				<span>{{ 'CURRENT_USAGE' | translate }}: {{ characterCount | number }}
-					/ {{ characterLimit | number }}</span>
-				<div class="usage-bar">
-					<div [style.width.%]="(characterCount / characterLimit) * 100" class="usage-progress"></div>
+		@if (isUpdatingUsage) {
+
+			@if (countdownValue > 0) {
+				<div class="updating-usage">
+					{{ 'USAGE_UPDATE_NOTICE' | translate }}: {{ countdownValue }}s
+					<div class="countdown-bar">
+						<div [style.width.%]="countdownProgress" class="countdown-progress"></div>
+					</div>
+				</div>
+			}
+
+			@if (countdownValue === 0 && retryCount > 0) {
+				<div class="updating-usage">
+					{{ 'CHECKING_USAGE_UPDATE' | translate }}: {{ retryCount }}/{{ MAX_RETRY_ATTEMPTS }}
+					<div class="countdown-bar">
+						<div [style.width.%]="(retryCount / MAX_RETRY_ATTEMPTS) * 100" class="countdown-progress"></div>
+					</div>
+				</div>
+			}
+
+		}
+
+		@if (!isLoadingUsage && !isUpdatingUsage && !usageError) {
+			<div class="usage-stats">
+				<div class="usage-header">{{ 'DEEPL_API_USAGE' | translate }}</div>
+				<div class="usage-details">
+					<span>{{ 'CURRENT_USAGE' | translate }}: {{ characterCount | number }} / {{ characterLimit | number }}</span>
+					<div class="usage-bar">
+						<div [style.width.%]="(characterCount / characterLimit) * 100" class="usage-progress"></div>
+					</div>
 				</div>
 			</div>
-		</div>
-	</ng-container>
+		}
+
+	}
 
 	<!-- Google Translate API Usage Information -->
-	<ng-container *ngIf="selectedApi === 'google-free'">
-		<div *ngIf="!isLoadingUsage && !usageError" class="usage-stats">
-			<div class="usage-header">{{ 'GOOGLE_API_USAGE' | translate }}</div>
-			<div class="usage-details">
-				<!-- Monthly limit -->
-				<div class="limit-section">
-					<span class="limit-label">{{ 'MONTHLY_LIMIT' | translate }}:</span>
-					<span>{{ characterCount | number }} / {{ characterLimit | number }}</span>
-					<div class="usage-bar">
-						<div [style.width.%]="(characterCount / characterLimit) * 100"
-							 class="usage-progress"></div>
-					</div>
-				</div>
+	@if (selectedApi === 'google-free') {
 
-				<!-- Weekly limit -->
-				<div class="limit-section">
-					<span class="limit-label">{{ 'WEEKLY_LIMIT' | translate }}:</span>
-					<span>{{ characterCount | number }} / {{ weeklyLimit | number }}</span>
-					<div class="usage-bar">
-						<div [style.width.%]="(characterCount / weeklyLimit) * 100"
-							 class="usage-progress"></div>
-					</div>
-				</div>
+		@if (!isLoadingUsage && !usageError) {
+			<div class="usage-stats">
+				<div class="usage-header">{{ 'GOOGLE_API_USAGE' | translate }}</div>
+				<div class="usage-details">
 
-				<!-- Daily limit -->
-				<div class="limit-section">
-					<span class="limit-label">{{ 'DAILY_LIMIT' | translate }}:</span>
-					<span>{{ characterCount | number }} / {{ dailyLimit | number }}</span>
-					<div class="usage-bar">
-						<div [style.width.%]="(characterCount / dailyLimit) * 100" class="usage-progress"></div>
+					<!-- Monthly limit -->
+					<div class="limit-section">
+						<span class="limit-label">{{ 'MONTHLY_LIMIT' | translate }}:</span>
+						<span>{{ characterCount | number }} / {{ characterLimit | number }}</span>
+						<div class="usage-bar">
+							<div [style.width.%]="(characterCount / characterLimit) * 100" class="usage-progress"></div>
+						</div>
 					</div>
-				</div>
 
-				<!-- Maximum characters per file -->
-				<div class="limit-section">
-					<span class="limit-label">{{ 'MAX_CHARS_PER_FILE' | translate }}:</span>
-					<span>{{ fileCharLimit | number }} {{ 'CHARACTERS' | translate }}</span>
+					<!-- Weekly limit -->
+					<div class="limit-section">
+						<span class="limit-label">{{ 'WEEKLY_LIMIT' | translate }}:</span>
+						<span>{{ characterCount | number }} / {{ weeklyLimit | number }}</span>
+						<div class="usage-bar">
+							<div [style.width.%]="(characterCount / weeklyLimit) * 100" class="usage-progress"></div>
+						</div>
+					</div>
+
+					<!-- Daily limit -->
+					<div class="limit-section">
+						<span class="limit-label">{{ 'DAILY_LIMIT' | translate }}:</span>
+						<span>{{ characterCount | number }} / {{ dailyLimit | number }}</span>
+						<div class="usage-bar">
+							<div [style.width.%]="(characterCount / dailyLimit) * 100" class="usage-progress"></div>
+						</div>
+					</div>
+
+					<!-- Maximum characters per file -->
+					<div class="limit-section">
+						<span class="limit-label">{{ 'MAX_CHARS_PER_FILE' | translate }}:</span>
+						<span>{{ fileCharLimit | number }} {{ 'CHARACTERS' | translate }}</span>
+					</div>
+
 				</div>
+				<div class="usage-note">{{ 'GOOGLE_USAGE_NOTE' | translate }}</div>
 			</div>
-			<div class="usage-note">{{ 'GOOGLE_USAGE_NOTE' | translate }}</div>
-		</div>
-	</ng-container>
+		}
 
-	<div *ngIf="usageError" class="usage-error">
-		{{ usageError }}
-	</div>
+	}
+
+	@if (usageError) {
+		<div class="usage-error">
+			{{ usageError }}
+		</div>
+	}
+
 </div>

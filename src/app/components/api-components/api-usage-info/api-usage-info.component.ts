@@ -24,8 +24,4 @@ export class ApiUsageInfoComponent {
 	@Input() retryCount: number = 0;
 	@Input() MAX_RETRY_ATTEMPTS: number = 5;
 
-	constructor() {
-	}
-
-
 }

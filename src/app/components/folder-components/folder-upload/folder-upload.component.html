@@ -1,14 +1,16 @@
 <div class="folder-upload" [class.drag-over]="isDragOver"
-     (dragover)="onDragOver($event)"
-     (dragleave)="onDragLeave($event)"
-     (drop)="onDrop($event)">
-  <div class="instructions">
-    <button type="button" class="select-button" (click)="triggerFolderInput()">
-      {{ 'SELECT_FOLDER' | translate }}
-    </button>
-    <div class="hint">{{ 'DROP_FOLDER_HINT' | translate }}</div>
-  </div>
-  <input #folderInput type="file" webkitdirectory directory multiple (change)="onFolderSelected($event)" hidden>
+	 (dragover)="onDragOver($event)"
+	 (dragleave)="onDragLeave($event)"
+	 (drop)="onDrop($event)">
+	<div class="instructions">
+		<button type="button" class="select-button" (click)="triggerFolderInput()">
+			{{ 'SELECT_FOLDER' | translate }}
+		</button>
+		<div class="hint">{{ 'DROP_FOLDER_HINT' | translate }}</div>
+	</div>
+	<input #folderInput type="file" webkitdirectory directory multiple (change)="onFolderSelected($event)" hidden>
 </div>
 
-<div class="error" *ngIf="showError">{{ errorMessage }}</div>
+@if (showError) {
+	<div class="error">{{ errorMessage }}</div>
+}

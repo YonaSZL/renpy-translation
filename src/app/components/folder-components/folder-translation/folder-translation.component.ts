@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TranslateModule} from '@ngx-translate/core';
 import {RenpyFileParserService} from '../../../services/renpy-file-parser.service';
 import {TranslationProcessorService} from '../../../services/translation-processor.service';
 import {TranslationApiService} from '../../../services/translation-api.service';
@@ -39,7 +39,6 @@ export class FolderTranslationComponent {
 	fileMetas: FolderFileMeta[] = [];
 
 	constructor(
-		private readonly translateService: TranslateService,
 		private readonly renpyFileParser: RenpyFileParserService,
 		private readonly translationProcessor: TranslationProcessorService,
 		private readonly translationApi: TranslationApiService
@@ -155,7 +154,10 @@ export class FolderTranslationComponent {
 					zip.file(meta.relativePath, replaced);
 					meta.status = 'translated';
 					remaining -= meta.charCount;
-				} else if (!partialUsed) {
+				} else if (partialUsed) {
+					// Should not reach due to earlier remaining check, but keep for safety
+					meta.status = 'skipped';
+				} else {
 					// Partial translate: take as many lines as fit into remaining (line-boundary)
 					let acc = 0;
 					let count = 0;
@@ -177,9 +179,6 @@ export class FolderTranslationComponent {
 					remaining = 0;
 					partialUsed = true;
 					// From now on, all others will be skipped due to remaining==0 (per user rule)
-				} else {
-					// Should not reach due to earlier remaining check, but keep for safety
-					meta.status = 'skipped';
 				}
 			} catch (e: any) {
 				meta.status = 'error';
